@@ -1,16 +1,20 @@
 package com.sh.pojo;
 
-import com.google.gson.Gson;
+import com.sh.pojo.account.AccountController;
 import com.sh.pojo.account.AccountService;
-import com.sh.pojo.account.domain.form.SignUpForm;
-import com.sh.pojo.config.network.JsonTransformer;
 
 import static spark.Spark.*;
 
 public class Main {
     public static void main(String[] args) {
 
-        AccountService accountService = AccountService.getBean();
+        new AccountController(AccountService.getBean());
+
+        after((req, res) -> {
+            res.type("application/json");
+        });
+
+/*        AccountService accountService = AccountService.getBean();
 
         path("/api", () -> {
             path("/", () -> {
@@ -27,6 +31,6 @@ public class Main {
                     res.type("application/json");
                 });
             });
-        });
+        });*/
     }
 }

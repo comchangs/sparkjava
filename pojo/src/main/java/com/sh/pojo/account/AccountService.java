@@ -44,4 +44,16 @@ public class AccountService {
     private boolean save(Account account) {
         return accountRepository.save(account);
     }
+
+    public boolean signOut(Long id) {
+        System.out.println("service id > "+id);
+        if(getAccountById(id) == null) return false;  // todo exception or 사용자 확인..
+        accountRepository.deleteById(id);
+        return true;
+    }
+
+    private Account getAccountById(Long id) {
+        System.out.println("service method id > "+id);
+        return (Account) accountRepository.findById(id);
+    }
 }

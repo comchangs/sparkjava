@@ -57,7 +57,6 @@ public class AccountDao implements AccountRepository {
     public boolean save(Account account) {
         Connection connection = null;
         PreparedStatement statement = null;
-        Account getAccount = null;
         try {
 //            System.out.println(account.toString());
             connection = connectionMaker.makeConnection();
@@ -96,8 +95,56 @@ public class AccountDao implements AccountRepository {
     }
 
     @Override
-    public Object findById(Long id) {
-        return null;
+    public Account findById(Long id) {
+        System.out.println("db id > "+id);
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        Account getAccount = null;
+
+
+        try {
+            connection = connectionMaker.makeConnection();
+            String query = "SELECT * FROM account WHERE id = ? ";
+            System.out.println("2 > "+query);
+            statement = connection.prepareStatement(query);
+            statement.setLong(1,id);
+            System.out.println("3 > "+statement.toString());
+            resultSet = statement.executeQuery();
+            System.out.println("4 > "+resultSet.toString());
+
+            if(!resultSet.next()) return getAccount;
+
+            getAccount = new Account();
+            getAccount.setId(resultSet.getLong("id"));
+            getAccount.setNickname(resultSet.getString("nickname"));
+            getAccount.setEmail(resultSet.getString("email"));
+            getAccount.setJoinedAt(resultSet.getObject("join_at", LocalDate.class));
+            getAccount.setPasswordUpdateDate(resultSet.getObject("password_update_date",LocalDate.class));
+            getAccount.setAlarmChangePassword(resultSet.getBoolean("alarm_change_password"));
+            getAccount.setReceiveEmail(resultSet.getBoolean("receive_email"));
+
+        }catch (ClassNotFoundException | SQLException e1) {
+            System.out.println(" error of account findById ");
+        } finally {
+            if (statement != null ) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            if ( connection != null ) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+
+                }
+            }
+        }
+
+        return getAccount;
     }
 
     @Override
@@ -111,7 +158,7 @@ public class AccountDao implements AccountRepository {
             String query = "SELECT * FROM account ORDER BY account_id ASC;";
 
             statement = connection.prepareStatement(query);
-            resultSet = statement.executeQuery(query);
+            resultSet = statement.executeQuery();
 
             while(resultSet.next()) {
                 Account getAccount = new Account();
@@ -225,7 +272,33 @@ public class AccountDao implements AccountRepository {
 
     @Override
     public void deleteById(Long id) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        try {
+            connection = connectionMaker.makeConnection();
+            String sql = "DELETE FROM account WHERE id=?";
+            statement = connection.prepareStatement(sql);
+            statement.setLong(1,id);
+            statement.executeUpdate();
+        } catch (ClassNotFoundException | SQLException e1) {
+            System.out.println("error : account deleteById ");
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    // here not throw out, complete for connection close
+                }
+            }
+            if ( connection != null ) {
+                try {
+                    connection.close();
+                    System.out.println("account deleteById OK");
+                } catch (SQLException e) {
 
+                }
+            }
+        }
     }
 
 }
