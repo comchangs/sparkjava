@@ -1,0 +1,21 @@
+plugins {
+	id 'java'
+}
+
+group = 'com.sh'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation  'com.sparkjava:spark-core:2.9.3'
+	implementation 'com.google.code.gson:gson:2.8.7'
+	implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.25'
+}
+
+test {
+	useJUnitPlatform()
+}
