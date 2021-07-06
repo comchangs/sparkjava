@@ -46,10 +46,9 @@ public class AccountService {
     }
 
     public boolean signOut(Long id) {
-        System.out.println("service id > "+id);
         if(getAccountById(id) == null) return false;  // todo exception or 사용자 확인..
-        accountRepository.deleteById(id);
-        return true;
+        int result = accountRepository.deleteById(id);
+        return result > 0;
     }
 
     private Account getAccountById(Long id) {

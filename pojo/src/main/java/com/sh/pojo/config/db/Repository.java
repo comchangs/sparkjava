@@ -4,6 +4,6 @@ public interface Repository<Obejct, G> {
 
     Object findById(G id);
 
-    void deleteById(G id);
+    Integer deleteById(G id);
 
 }

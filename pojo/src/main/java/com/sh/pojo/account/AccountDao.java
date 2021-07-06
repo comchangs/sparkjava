@@ -271,15 +271,16 @@ public class AccountDao implements AccountRepository {
     }
 
     @Override
-    public void deleteById(Long id) {
+    public Integer deleteById(Long id) {
         Connection connection = null;
         PreparedStatement statement = null;
+        int result = 0;
         try {
             connection = connectionMaker.makeConnection();
             String sql = "DELETE FROM account WHERE id=?";
             statement = connection.prepareStatement(sql);
             statement.setLong(1,id);
-            statement.executeUpdate();
+            result = statement.executeUpdate();
         } catch (ClassNotFoundException | SQLException e1) {
             System.out.println("error : account deleteById ");
         } finally {
@@ -299,6 +300,6 @@ public class AccountDao implements AccountRepository {
                 }
             }
         }
+        return result;
     }
-
 }

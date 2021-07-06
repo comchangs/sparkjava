@@ -1,14 +1,16 @@
 package com.sh.pojo.account;
 
 import com.google.gson.Gson;
-import com.sh.pojo.account.domain.Account;
 import com.sh.pojo.account.domain.form.SignUpForm;
 import com.sh.pojo.config.network.JsonTransformer;
+import com.sh.pojo.config.network.header.Header;
 
 import static spark.Spark.*;
 
 public class AccountController {
+
     public AccountController(AccountService accountService) {
+
         path("/api",() -> {
             path("/", () -> {
 
@@ -17,19 +19,37 @@ public class AccountController {
                     SignUpForm signUpForm = gson.fromJson(req.body(), SignUpForm.class);
                     boolean joined = accountService.joined(signUpForm);
                     res.status(201);
-                    return signUpForm;
+                    System.out.println("main > result : "+joined+" data "+ signUpForm.toString());
+                    return body(joined, "register",signUpForm, "error");
                 }, new JsonTransformer());
 
                 delete("/signOut/:id", (request, response) -> {
                     Long id = Long.parseLong(request.params(":id"));
-                    System.out.println("req > "+ id);
-                    response.redirect("/", 301);
                     boolean result = accountService.signOut(id);
-                    return null;
-                });
-            });
+                    System.out.println("main signOut > "+ id+" result : "+result);
+
+                    if (result) {
+                        response.redirect("/", 204);
+                    }
+//                    return (result)? Header.OK() : Header.error();
+                    return body(result, "signOut", null, "error");
+                }, new JsonTransformer());
+
+            });  // end of path
         });
     }
 
-
+    public Header body(boolean result, String api, Object body, String message ){
+        if(result) {
+            if(body == null) {
+                return Header.OK();
+            }
+            return Header.OK(api, body);
+        } else {
+            if(body != null) {
+                return Header.fail(api, body);
+            }
+            return Header.error();
+        }
+    }
 }
