@@ -53,7 +53,7 @@ public class AccountDao implements AccountRepository {
         }
     }
 
-
+    @Override
     public boolean save(Account account) {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -102,8 +102,6 @@ public class AccountDao implements AccountRepository {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         Account getAccount = null;
-
-
         try {
             connection = connectionMaker.makeConnection();
             String query = "SELECT * FROM account WHERE id = ? ";
@@ -231,7 +229,6 @@ public class AccountDao implements AccountRepository {
         return result;
     }
 
-
     public boolean existsByNickname(SignUpForm form){
         Connection connection = null;
         PreparedStatement statement = null;
@@ -270,6 +267,83 @@ public class AccountDao implements AccountRepository {
     }
 
     @Override
+    public Boolean updatePassword(Account account) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+
+        try {
+            connection = connectionMaker.makeConnection();
+            String query = "UPDATE account SET password= ?, password_update_date= ? WHERE id=?";
+            statement = connection.prepareStatement(query);
+            statement.setString(1,account.getPassword());
+            statement.setObject(2,account.getPasswordUpdateDate());
+            statement.setLong(3, account.getId());
+
+            int result = statement.executeUpdate();
+            if(result!=1) return false;
+
+        }  catch (ClassNotFoundException | SQLException e1) {
+            e1.printStackTrace();
+        } finally {
+            if (statement != null ) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            if ( connection != null ) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+
+                }
+            }
+        }
+        return true;
+    }
+
+
+    @Override
+    public Boolean update(Account account) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+
+        try {
+            connection = connectionMaker.makeConnection();
+            String query = "UPDATE account SET nickname= ?, email= ?, receive_email= ? WHERE id=?";
+            statement = connection.prepareStatement(query);
+            statement.setString(1,account.getNickname());
+            statement.setObject(2,account.getEmail());
+            statement.setBoolean(3,account.isReceiveEmail());
+            statement.setLong(4, account.getId());
+
+            int result = statement.executeUpdate();
+            if(result!=1) return false;
+        }  catch (ClassNotFoundException | SQLException e1) {
+            e1.printStackTrace();
+        } finally {
+            if (statement != null ) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            if ( connection != null ) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
     public Integer deleteById(Long id) {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -301,4 +375,5 @@ public class AccountDao implements AccountRepository {
         }
         return result;
     }
+
 }

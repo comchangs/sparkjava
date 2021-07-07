@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface AccountRepository extends Repository<Account, Long> {
 
-    boolean save(Account account);
-
     List<Account> findByAll();
 
     boolean existsByNickname(SignUpForm form);
 
     boolean existsByEmail(SignUpForm form);
+
+    Boolean updatePassword(Account account);
 }

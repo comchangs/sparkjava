@@ -1,22 +1,21 @@
 package com.sh.pojo.account;
 
 import com.google.gson.Gson;
-import com.sh.pojo.account.domain.Account;
-import com.sh.pojo.account.domain.form.AccountRequest;
 import com.sh.pojo.account.domain.form.AccountResponse;
 import com.sh.pojo.account.domain.form.PasswordForm;
 import com.sh.pojo.account.domain.form.SignUpForm;
 import com.sh.pojo.config.network.JsonTransformer;
+import com.sh.pojo.config.network.ResponseBody;
 import com.sh.pojo.config.network.header.Header;
 
 import static spark.Spark.*;
 
-public class AccountController {
+public class AccountApi {
 
-    public AccountController(AccountService accountService) {
+    public AccountApi(AccountService accountService) {
 
         path("/api",() -> {
-                path("/", () -> {
+            path("/", () -> {
 
                 post("/register", "application/json", (req, res) -> {
                     Gson gson = new Gson();
@@ -24,7 +23,7 @@ public class AccountController {
                     boolean joined = accountService.joined(signUpForm);
                     System.out.println("main > result : "+joined+" data "+ signUpForm.toString());
                     res.status(201);
-                    return body(joined, "register",signUpForm, "error");
+                    return ResponseBody.of(joined, "register",signUpForm, "error");
                 }, new JsonTransformer());
 
                 delete("/signOut/:id", (request, response) -> {
@@ -35,58 +34,45 @@ public class AccountController {
                     if (result) {
                         response.redirect("/", 204);
                     }
-                    return body(result, "signOut", null, "error");
+                    return ResponseBody.of(result, null, null, "error");
                 }, new JsonTransformer());
 
             });  // end of path
-        });
 
-        path("/account",() -> {
-            path("/", () -> {
 
+            path("/account",() -> {
                 get("/:id", "application/json", (request, response) -> {
                     Long id = Long.parseLong(request.params(":id"));
                     AccountResponse getAccount = accountService.getAccount(id);
-                    return body(true, "account/id",getAccount, "");
+                    return ResponseBody.of(true, "account/id",getAccount, "");
                 }, new JsonTransformer());
 
-                patch("/:id", "application/json", (request, response) -> {
+                patch("", "application/json", (request, response) -> {
                     Gson gson = new Gson();
                     PasswordForm password = gson.fromJson(request.body(), PasswordForm.class);
-                    accountService.updatePassword(password);
+                    accountService.modifyPassword(password);
 
                     // TODO session 변경
                     // EXCEIPTION 없이 진행 되면 TRUE
 
-                    return body(true, "account/id",null, "");
+                    return ResponseBody.of(true, "account/id",null, "");
                 }, new JsonTransformer());
 
-                put("/", "application/json", (request, response) -> {
+                // TODO 알람 등 정보 초기화 요청 로직시
+ /*               put("/", "application/json", (request, response) -> {
                     Gson gson = new Gson();
                     AccountRequest account = gson.fromJson(request.body(), AccountRequest.class);
-                    AccountResponse getAccount = accountService.update(account);
+                    AccountResponse getAccount = accountService.modifyAccountInfo(account);
 
                     // TODO session과 무관
                     // TODO   EXCEIPTION 없이 진행 되면 TRUE
 
                     return body(true, "account/id", getAccount, "");
-                }, new JsonTransformer());
+                }, new JsonTransformer());*/
 
-            });  // end of path
+            });
         });
+
     }
 
-    public Header body(boolean result, String api, Object body, String message ){
-        if(result) {
-            if(body == null) {
-                return Header.OK();
-            }
-            return Header.OK(api, body);
-        } else {
-            if(body != null) {
-                return Header.fail(api, body);
-            }
-            return Header.error();
-        }
-    }
 }

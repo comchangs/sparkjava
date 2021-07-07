@@ -1,9 +1,16 @@
 package com.sh.pojo.config.db;
 
-public interface Repository<Obejct, G> {
+import java.util.List;
+
+public interface Repository<T, G> {
+
+    boolean save(T obj);
 
     Object findById(G id);
 
-    Integer deleteById(G id);
+    List<T> findByAll();
 
+    Boolean update(T obj);
+
+    Integer deleteById(G id);
 }

@@ -56,10 +56,10 @@ public class Header {
     }
 
     // FAIL
-    public static Header fail(String resons, Object data) {
+    public static Header fail(String reason, Object data) {
         return (Header) Header.builder()
                 .status("fail")
-                .data(resons, data)
+                .data(reason, data)
                 .build();
     }
     // ERROR

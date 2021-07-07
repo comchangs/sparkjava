@@ -61,17 +61,27 @@ public class AccountService {
         return result > 0;
     }
 
-    public void updatePassword(PasswordForm password) {
+    public void modifyPassword(PasswordForm password) {
         Account getAccount = getAccountById(password.getId());
-        if (!isPasswordMach(getAccount, password.getPassword())) throw new AccountWrongPasswordException();
+        getAccount.updatePassword(password.getPassword());
+        this.updatePassword(getAccount);
     }
 
-    public AccountResponse update(AccountRequest account) {
+    private void updatePassword(Account account) {
+        if(!accountRepository.updatePassword(account)) throw new RuntimeException("Server 500");
+    }
+
+    public AccountResponse modifyAccountInfo(AccountRequest account) {
+        //TODO nickname, email 중복체크
         Account getAccount = getAccountById(account.getId());
         getAccount.update(account);
+        this.updateAccountInfo(getAccount);
         return response(getAccount);
     }
 
+    private void updateAccountInfo(Account account) {
+        if(!accountRepository.update(account)) throw new RuntimeException("Server 500");
+    }
     public List<Account> accounts(){
         return accountRepository.findByAll();
     }
