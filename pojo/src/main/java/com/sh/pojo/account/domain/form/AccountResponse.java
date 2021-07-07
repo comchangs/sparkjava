@@ -10,8 +10,6 @@ public class AccountResponse {
 
     private String email;
 
-    private LocalDate joinedAt;
-
     private boolean alarmChangePassword;
 
     private boolean receiveEmail;
@@ -40,14 +38,6 @@ public class AccountResponse {
         this.email = email;
     }
 
-    public LocalDate getJoinedAt() {
-        return joinedAt;
-    }
-
-    public void setJoinedAt(LocalDate joinedAt) {
-        this.joinedAt = joinedAt;
-    }
-
     public boolean isAlarmChangePassword() {
         return alarmChangePassword;
     }
@@ -70,7 +60,6 @@ public class AccountResponse {
                 "id=" + id +
                 ", nickname='" + nickname + '\'' +
                 ", email='" + email + '\'' +
-                ", joinedAt=" + joinedAt +
                 ", alarmChangePassword=" + alarmChangePassword +
                 ", receiveEmail=" + receiveEmail +
                 '}';

@@ -2,6 +2,7 @@ package com.sh.pojo.account;
 
 import com.google.gson.Gson;
 import com.sh.pojo.account.domain.Account;
+import com.sh.pojo.account.domain.form.AccountRequest;
 import com.sh.pojo.account.domain.form.AccountResponse;
 import com.sh.pojo.account.domain.form.PasswordForm;
 import com.sh.pojo.account.domain.form.SignUpForm;
@@ -64,13 +65,13 @@ public class AccountController {
 
                 put("/", "application/json", (request, response) -> {
                     Gson gson = new Gson();
-                    Account account = gson.fromJson(request.body(), Account.class);
+                    AccountRequest account = gson.fromJson(request.body(), AccountRequest.class);
                     AccountResponse getAccount = accountService.update(account);
 
                     // TODO session과 무관
                     // TODO   EXCEIPTION 없이 진행 되면 TRUE
 
-                    return body(true, "account/id",getAccount, "");
+                    return body(true, "account/id", getAccount, "");
                 }, new JsonTransformer());
 
             });  // end of path

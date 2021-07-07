@@ -58,15 +58,17 @@ public class AccountDao implements AccountRepository {
         Connection connection = null;
         PreparedStatement statement = null;
         try {
-//            System.out.println(account.toString());
             connection = connectionMaker.makeConnection();
-            String query = "INSERT INTO account (nickname, password, email, join_at) VALUES (?,?,?,?);";
+            String query = "INSERT INTO account (nickname, password, email, join_at, password_update_date, alarm_change_password, receive_email) VALUES (?,?,?,?,?,?,?);";
 
             statement = connection.prepareStatement(query);
             statement.setString(1,account.getNickname());
             statement.setString(2,account.getPassword());
             statement.setString(3,account.getEmail());
             statement.setObject(4,account.getJoinedAt());
+            statement.setObject(5,account.getPasswordUpdateDate());
+            statement.setBoolean(6,account.isAlarmChangePassword());
+            statement.setBoolean(7,account.isReceiveEmail());
             int result = statement.executeUpdate();
             if(result!=1) return false;
 
@@ -115,15 +117,15 @@ public class AccountDao implements AccountRepository {
 
             if(!resultSet.next()) return getAccount;
 
-            getAccount = new Account();
-            getAccount.setId(resultSet.getLong("id"));
-            getAccount.setNickname(resultSet.getString("nickname"));
-            getAccount.setEmail(resultSet.getString("email"));
-            getAccount.setJoinedAt(resultSet.getObject("join_at", LocalDate.class));
-            getAccount.setPasswordUpdateDate(resultSet.getObject("password_update_date",LocalDate.class));
-            getAccount.setAlarmChangePassword(resultSet.getBoolean("alarm_change_password"));
-            getAccount.setReceiveEmail(resultSet.getBoolean("receive_email"));
-
+            getAccount = new Account(
+                    resultSet.getLong("id"),
+                    resultSet.getString("nickname"),
+                    resultSet.getString("email"),
+                    resultSet.getObject("join_at", LocalDate.class),
+                    resultSet.getObject("password_update_date",LocalDate.class),
+                    resultSet.getBoolean("alarm_change_password"),
+                    resultSet.getBoolean("receive_email")
+            );
         }catch (ClassNotFoundException | SQLException e1) {
             System.out.println(" error of account findById ");
         } finally {
@@ -161,14 +163,15 @@ public class AccountDao implements AccountRepository {
             resultSet = statement.executeQuery();
 
             while(resultSet.next()) {
-                Account getAccount = new Account();
-                getAccount.setId(resultSet.getLong("id"));
-                getAccount.setNickname(resultSet.getString("nickname"));
-                getAccount.setEmail(resultSet.getString("email"));
-                getAccount.setJoinedAt(resultSet.getObject("join_at", LocalDate.class));
-                getAccount.setPasswordUpdateDate(resultSet.getObject("password_update_date",LocalDate.class));
-                getAccount.setAlarmChangePassword(resultSet.getBoolean("alarm_change_password"));
-                getAccount.setReceiveEmail(resultSet.getBoolean("receive_email"));
+                Account getAccount = getAccount = new Account(
+                        resultSet.getLong("id"),
+                        resultSet.getString("nickname"),
+                        resultSet.getString("email"),
+                        resultSet.getObject("join_at", LocalDate.class),
+                        resultSet.getObject("password_update_date",LocalDate.class),
+                        resultSet.getBoolean("alarm_change_password"),
+                        resultSet.getBoolean("receive_email")
+                );
                 accountList.add(getAccount);
             }
 

@@ -9,7 +9,6 @@ public class JsonTransformer implements ResponseTransformer {
 
     @Override
     public String render(Object model) {
-        System.out.println("render > "+model.toString());
         return gson.toJson(model);
     }
 }

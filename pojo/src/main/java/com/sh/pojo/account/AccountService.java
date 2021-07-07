@@ -1,6 +1,7 @@
 package com.sh.pojo.account;
 
 import com.sh.pojo.account.domain.Account;
+import com.sh.pojo.account.domain.form.AccountRequest;
 import com.sh.pojo.account.domain.form.AccountResponse;
 import com.sh.pojo.account.domain.form.PasswordForm;
 import com.sh.pojo.account.domain.form.SignUpForm;
@@ -9,7 +10,6 @@ import com.sh.pojo.account.exception.AccountWrongPasswordException;
 import com.sh.pojo.config.PasswordHashing;
 import com.sh.pojo.config.db.DaoFactory;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public class AccountService {
@@ -32,32 +32,16 @@ public class AccountService {
     }
 
     public boolean joined(SignUpForm form) {
-        Account account = new Account();
-        account.setNickname(form.getNickname());
-//        account.setPassword(PasswordHashing.encode(form.getPassword()));
-        account.setPassword(form.getPassword());  // TODO hashing
-        account.setEmail(form.getEmail());
-        account.setJoinedAt(LocalDate.now());
-        return this.save(account);
-
+        Account newAccount = Account.createNewAccount(form.getNickname(), form.getEmail(), form.getPassword());
+        return this.save(newAccount);
     }
 
     private boolean save(Account account) {
         return accountRepository.save(account);
     }
 
-    public List<Account> accounts(){
-        return accountRepository.findByAll();
-    }
-
     public boolean isPasswordMach(Account account, String inputPassword) {
         return account.getPassword().equals(PasswordHashing.encode(inputPassword));
-    }
-
-    public boolean signOut(Long id) {
-        if(getAccountById(id) == null) return false;  // todo exception or 사용자 확인..
-        int result = accountRepository.deleteById(id);
-        return result > 0;
     }
 
     public Account getAccountById(Long id) {
@@ -66,11 +50,34 @@ public class AccountService {
         return getAccount;
     }
 
+    public boolean signOut(Long id) {
+        getAccountById(id);
+        int result = accountRepository.deleteById(id);
+        return result > 0;
+    }
+
     public void updatePassword(PasswordForm password) {
         Account getAccount = getAccountById(password.getId());
         if (!isPasswordMach(getAccount, password.getPassword())) throw new AccountWrongPasswordException();
     }
 
-    public AccountResponse update(Account account) {
+    public AccountResponse update(AccountRequest account) {
+        Account getAccount = getAccountById(account.getId());
+        getAccount.update(account);
+        return response(getAccount);
+    }
+
+    public List<Account> accounts(){
+        return accountRepository.findByAll();
+    }
+
+    private AccountResponse response(Account account) {
+        AccountResponse accountResponse = new AccountResponse();
+        accountResponse.setId(account.getId());
+        accountResponse.setNickname(account.getNickname());
+        accountResponse.setEmail(account.getEmail());
+        accountResponse.setReceiveEmail(account.isReceiveEmail());
+        return accountResponse;
+//        return Header.OK(userApiResponse);
     }
 }
