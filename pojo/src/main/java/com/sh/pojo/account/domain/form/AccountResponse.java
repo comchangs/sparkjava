@@ -1,5 +1,8 @@
 package com.sh.pojo.account.domain.form;
 
+import com.sh.pojo.common.DateFormatter;
+import com.sh.pojo.common.DatePattern;
+
 import java.time.LocalDate;
 
 public class AccountResponse {
@@ -9,6 +12,8 @@ public class AccountResponse {
     private String nickname;
 
     private String email;
+
+    private String joinedAt;
 
     private boolean alarmChangePassword;
 
@@ -36,6 +41,14 @@ public class AccountResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getJoinedAt() {
+        return joinedAt;
+    }
+
+    public void setJoinedAt(LocalDate date) {
+        this.joinedAt = new DatePattern(date).yearMonthDay();
     }
 
     public boolean isAlarmChangePassword() {

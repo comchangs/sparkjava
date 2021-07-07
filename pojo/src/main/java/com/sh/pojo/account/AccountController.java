@@ -44,11 +44,9 @@ public class AccountController {
         path("/account",() -> {
             path("/", () -> {
 
-                get("/:id", "application/json", (req, res) -> {
-                    Gson gson = new Gson();
-                    Long id = gson.fromJson(req.body(), Long.class);
-
-                    Account getAccount = accountService.getAccountById(id);
+                get("/:id", "application/json", (request, response) -> {
+                    Long id = Long.parseLong(request.params(":id"));
+                    AccountResponse getAccount = accountService.getAccount(id);
                     return body(true, "account/id",getAccount, "");
                 }, new JsonTransformer());
 

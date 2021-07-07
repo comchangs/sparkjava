@@ -7,6 +7,7 @@ import com.sh.pojo.account.domain.form.PasswordForm;
 import com.sh.pojo.account.domain.form.SignUpForm;
 import com.sh.pojo.account.exception.AccountNotFoundException;
 import com.sh.pojo.account.exception.AccountWrongPasswordException;
+import com.sh.pojo.common.DatePattern;
 import com.sh.pojo.config.PasswordHashing;
 import com.sh.pojo.config.db.DaoFactory;
 
@@ -44,10 +45,14 @@ public class AccountService {
         return account.getPassword().equals(PasswordHashing.encode(inputPassword));
     }
 
-    public Account getAccountById(Long id) {
+    private Account getAccountById(Long id) {
         Account getAccount = (Account) accountRepository.findById(id);
         if(getAccount == null ) throw new AccountNotFoundException();
         return getAccount;
+    }
+
+    public AccountResponse getAccount(Long id) {
+        return response(getAccountById(id));
     }
 
     public boolean signOut(Long id) {
@@ -76,8 +81,11 @@ public class AccountService {
         accountResponse.setId(account.getId());
         accountResponse.setNickname(account.getNickname());
         accountResponse.setEmail(account.getEmail());
+        accountResponse.setJoinedAt(account.getJoinedAt());
         accountResponse.setReceiveEmail(account.isReceiveEmail());
         return accountResponse;
 //        return Header.OK(userApiResponse);
     }
+
+
 }

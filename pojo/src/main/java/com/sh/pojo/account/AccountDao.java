@@ -98,7 +98,6 @@ public class AccountDao implements AccountRepository {
 
     @Override
     public Account findById(Long id) {
-        System.out.println("db id > "+id);
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -108,12 +107,9 @@ public class AccountDao implements AccountRepository {
         try {
             connection = connectionMaker.makeConnection();
             String query = "SELECT * FROM account WHERE id = ? ";
-            System.out.println("2 > "+query);
             statement = connection.prepareStatement(query);
             statement.setLong(1,id);
-            System.out.println("3 > "+statement.toString());
             resultSet = statement.executeQuery();
-            System.out.println("4 > "+resultSet.toString());
 
             if(!resultSet.next()) return getAccount;
 
