@@ -13,4 +13,6 @@ public interface Repository<T, G> {
     Boolean update(T obj);
 
     Integer deleteById(G id);
+
+    void deleteAll();
 }

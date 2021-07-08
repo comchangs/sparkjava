@@ -69,4 +69,9 @@ public class UserDao implements UserRepository {
     public Integer deleteById(Long id) {
         return null;
     }
+
+    @Override
+    public void deleteAll() {
+
+    }
 }

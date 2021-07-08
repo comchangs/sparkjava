@@ -2,7 +2,6 @@ package com.sh.pojo.account;
 
 import com.sh.pojo.account.domain.Account;
 import com.sh.pojo.account.domain.form.AccountAdminResponse;
-import com.sh.pojo.account.domain.form.AccountResponse;
 import com.sh.pojo.account.domain.form.SignUpForm;
 import com.sh.pojo.common.Page;
 import com.sh.pojo.config.db.ConnectionMaker;
@@ -199,6 +198,60 @@ public class AccountDao implements AccountRepository {
         return accountList;
     }
 
+    public Account findByNickname(String nickname) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        Account getAccount = null;
+
+        try {
+            connection = connectionMaker.makeConnection();
+
+            String sql = "select * from account where nickname=?";
+            statement = connection.prepareStatement(sql);
+            statement.setString(1, nickname);
+            resultSet = statement.executeQuery();
+
+            if(!resultSet.next()) return null;
+
+            getAccount = new Account(
+                    resultSet.getLong("account_id"),
+                    resultSet.getString("nickname"),
+                    resultSet.getString("email"),
+                    resultSet.getObject("join_at", LocalDate.class),
+                    resultSet.getObject("password_update_date",LocalDate.class),
+                    resultSet.getBoolean("alarm_change_password"),
+                    resultSet.getBoolean("receive_email")
+            );
+
+        }catch (ClassNotFoundException | SQLException e1) {
+            System.out.println("account nickname 조회 오류");
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    // here not throw out, complete for connection close
+                }
+            }
+            if  (resultSet != null) {
+                try {
+                    resultSet.close();
+                } catch (SQLException e) {
+                    // here not throw out, complete for connection close
+                }
+            }
+            if ( connection != null ) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+
+                }
+            }
+        }
+        return getAccount;
+    }
+
 
     public boolean existsByEmail(SignUpForm form){
         Connection connection = null;
@@ -383,5 +436,36 @@ public class AccountDao implements AccountRepository {
         }
         return result;
     }
+
+    @Override
+    public void deleteAll() {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        try {
+            connection = connectionMaker.makeConnection();
+            String sql = "truncate account;";
+            statement = connection.prepareStatement(sql);
+            statement.executeUpdate();
+        } catch (ClassNotFoundException | SQLException e1) {
+            System.out.println("account 삭제 오류");
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    // here not throw out, complete for connection close
+                }
+            }
+            if ( connection != null ) {
+                try {
+                    connection.close();
+                    System.out.println("삭제 완료");
+                } catch (SQLException e) {
+
+                }
+            }
+        }
+    }
+
 
 }

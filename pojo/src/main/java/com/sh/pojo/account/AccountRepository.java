@@ -12,6 +12,8 @@ public interface AccountRepository extends Repository<Account, Long> {
 
     List<AccountAdminResponse> findByAll(Page pageNumber);
 
+    Account findByNickname(String nickname);
+
     boolean existsByNickname(SignUpForm form);
 
     boolean existsByEmail(SignUpForm form);
