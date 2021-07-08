@@ -2,9 +2,9 @@ package com.sh.pojo.account.security;
 
 import static spark.Spark.*;
 
-public class UserApi {
+public class UserApiController {
 
-    public UserApi (){
+    public UserApiController(){
         path("/api",() -> {
 
 

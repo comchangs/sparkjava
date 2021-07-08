@@ -8,7 +8,7 @@ public interface Repository<T, G> {
 
     Object findById(G id);
 
-    List<T> findByAll();
+//    List<T> findByAll();
 
     Boolean update(T obj);
 

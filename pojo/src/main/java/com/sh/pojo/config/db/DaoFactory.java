@@ -2,27 +2,33 @@ package com.sh.pojo.config.db;
 
 import com.sh.pojo.account.AccountDao;
 import com.sh.pojo.account.AccountRepository;
+import com.sh.pojo.account.security.repository.UserDao;
+import com.sh.pojo.account.security.repository.UserRepository;
+
+import java.util.Objects;
 
 public class DaoFactory {
 
     private static final DaoFactory DAO_FACTORY = new DaoFactory();
     private DaoFactory() {}
 
-    public static <T> T getBean(Object obj) {
-        if(AccountRepository.class == obj) {
-            System.out.println("here ???");
+    public static <T> T getInstance(Object obj) {
+        if(Objects.equals(AccountRepository.class, obj)) {
             return (T) accountRepository();
         }
-        return null;
-    }
 
-/*    private static AccountDao accountDao() {
-        // UserDao가 필요로 하는 객체 생성 (클라이언트 쪽, service 등에서 주입)
-        return new AccountDao(makeConnection());
-    }*/
+        if(Objects.equals(UserRepository.class, obj)) {
+            return (T) userRepository();
+        }
+        throw new NullPointerException();
+    }
 
     private static AccountRepository accountRepository(){
         return new AccountDao(makeConnection());
+    }
+
+    private static UserRepository userRepository(){
+        return new UserDao(makeConnection());
     }
 
     private static ConnectionMaker makeConnection() {

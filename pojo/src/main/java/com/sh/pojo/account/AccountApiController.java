@@ -1,18 +1,24 @@
 package com.sh.pojo.account;
 
 import com.google.gson.Gson;
+import com.sh.pojo.account.domain.Account;
+import com.sh.pojo.account.domain.form.AccountAdminResponse;
 import com.sh.pojo.account.domain.form.AccountResponse;
 import com.sh.pojo.account.domain.form.PasswordForm;
 import com.sh.pojo.account.domain.form.SignUpForm;
+import com.sh.pojo.common.Page;
 import com.sh.pojo.config.network.response.Response;
+
+import java.util.List;
+import java.util.stream.DoubleStream;
 
 import static com.sh.pojo.config.network.response.JsonUtil.jsend;
 import static com.sh.pojo.config.network.response.JsonUtil.json;
 import static spark.Spark.*;
 
-public class AccountApi {
+public class AccountApiController {
 
-    public AccountApi(AccountService accountService) {
+    public AccountApiController(AccountService accountService) {
 
         path("/api",() -> {
             path("/", () -> {
@@ -36,11 +42,20 @@ public class AccountApi {
             });  // end of path
 
 
-            path("/account",() -> {
-                get("/:id", "application/json", (request, response) -> {
+            path("/accounts",() -> {
+                get("/:id", (request, response) -> {
                     Long id = Long.parseLong(request.params(":id"));
                     AccountResponse getAccount = accountService.getAccount(id);
                     return Response.OK(jsend("account", getAccount));
+                }, json());
+
+                // 관리자
+                get("", "application/json", (request, response) -> {
+                    Gson gson = new Gson();
+                    System.out.println(request.body());
+                    Page page = gson.fromJson(request.body(), Page.class);
+                    List<AccountAdminResponse> getAccount = accountService.getAccountList(page);
+                    return Response.OK(jsend("accounts", getAccount));
                 }, json());
 
                 patch("", "application/json", (request, response) -> {

@@ -60,12 +60,7 @@ public class UserDao implements UserRepository {
         return null;
     }
 
-    @Override
-    public List<User> findByAll() {
-        return null;
-    }
-
-    @Override
+      @Override
     public Boolean update(User obj) {
         return null;
     }

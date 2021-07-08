@@ -20,6 +20,6 @@ public class JsonUtil {
     public static JsonElement jsend(String api , Object obj){
         Map<String, Object> map = new HashMap<>();
         map.put(api, obj);
-        return new Gson().toJsonTree(map.get(api));
+        return new Gson().toJsonTree(map);
     }
 }

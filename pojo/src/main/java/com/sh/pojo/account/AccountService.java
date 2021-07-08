@@ -1,13 +1,9 @@
 package com.sh.pojo.account;
 
 import com.sh.pojo.account.domain.Account;
-import com.sh.pojo.account.domain.form.AccountRequest;
-import com.sh.pojo.account.domain.form.AccountResponse;
-import com.sh.pojo.account.domain.form.PasswordForm;
-import com.sh.pojo.account.domain.form.SignUpForm;
+import com.sh.pojo.account.domain.form.*;
 import com.sh.pojo.account.exception.AccountNotFoundException;
-import com.sh.pojo.account.exception.AccountWrongPasswordException;
-import com.sh.pojo.common.DatePattern;
+import com.sh.pojo.common.Page;
 import com.sh.pojo.config.PasswordHashing;
 import com.sh.pojo.config.db.DaoFactory;
 
@@ -17,7 +13,7 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
 
-    private static final AccountService accountService = new AccountService(DaoFactory.getBean(AccountRepository.class));
+    private static final AccountService accountService = new AccountService(DaoFactory.getInstance(AccountRepository.class));
 
     private AccountService(AccountRepository accountRepository){
         this.accountRepository = accountRepository;
@@ -82,8 +78,10 @@ public class AccountService {
     private void updateAccountInfo(Account account) {
         if(!accountRepository.update(account)) throw new RuntimeException("Server 500");
     }
-    public List<Account> accounts(){
-        return accountRepository.findByAll();
+
+    public List<AccountAdminResponse> getAccountList(Page page) {
+        System.out.println("service > "+page.totalRows());
+        return accountRepository.findByAll(page);
     }
 
     private AccountResponse response(Account account) {
@@ -96,6 +94,5 @@ public class AccountService {
         return accountResponse;
 //        return Header.OK(userApiResponse);
     }
-
 
 }
