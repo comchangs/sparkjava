@@ -39,6 +39,9 @@ class AccountDaoTest {
         assertNotNull(getAccount);
         assertEquals(getAccount.getEmail(), account.getEmail());
 
+        boolean result = accountRepository.existsByNickname("testNew_Sunhwa");
+        assertTrue(result);
+
         // 수정
         getAccount.updatePassword("TestOf_changePwd");
         boolean  resultOfUpdatePwd = accountRepository.updatePassword(getAccount);
@@ -46,6 +49,20 @@ class AccountDaoTest {
         // 수정 데이터 확인
         Account checkResult = (Account) accountRepository.findById(getAccount.getId());
         assertNotEquals(checkResult.getPassword(), getAccount.getPassword());
+    }
+
+    @Test
+    @DisplayName("account_저장,조회")
+    void accountDaoCR()  {
+        // 저장, 조회
+        Account newNicknameAccount = Account.createNewAccount("testNew_Sunhwa", email, pwd);
+        accountRepository.save(newNicknameAccount);
+        Account getAccount = accountRepository.findByNickname(newNicknameAccount.getNickname());
+        assertNotNull(getAccount);
+        assertEquals(getAccount.getEmail(), newNicknameAccount.getEmail());
+
+        Account checkResult = accountRepository.findById(getAccount.getId());
+        assertEquals(checkResult.getNickname(), getAccount.getNickname());
     }
 
     @Test
@@ -80,7 +97,10 @@ class AccountDaoTest {
     void accountDadList() {
         Page page = new Page(1,10);
         List<AccountAdminResponse> byAll = accountRepository.findByAll(page);
-        assertTrue(byAll.size()>0);
+/*        for (AccountAdminResponse account : byAll) {
+            System.out.println(account.toString());
+        }*/
+        assertTrue(byAll.size()>2);
     }
 
     @Disabled

@@ -2,18 +2,17 @@ package com.sh.pojo.account;
 
 import com.sh.pojo.account.domain.Account;
 import com.sh.pojo.account.domain.form.AccountAdminResponse;
-import com.sh.pojo.account.domain.form.SignUpForm;
 import com.sh.pojo.common.Page;
 import com.sh.pojo.config.db.ConnectionMaker;
-import com.sh.pojo.config.db.common.JdbcContext;
+import com.sh.pojo.config.db.jdbc.JdbcContext;
 import com.sh.pojo.config.db.exception.DataAccessEsception;
+import com.sh.pojo.config.db.jdbc.MapperRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class AccountDao implements AccountRepository {
     private Logger log = LoggerFactory.getLogger(this.getClass());
@@ -68,186 +67,67 @@ public class AccountDao implements AccountRepository {
 
     @Override
     public Account findById(Long id) {
-        Connection connection = null;
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
-        Account getAccount = null;
-        try {
-            connection = connectionMaker.makeConnection();
-            String query = "SELECT * FROM account WHERE account_id = ? ";
-            statement = connection.prepareStatement(query);
-            statement.setLong(1,id);
-            resultSet = statement.executeQuery();
+        String query = "SELECT * FROM account WHERE account_id = ? ";
 
-            if(!resultSet.next()) return getAccount;
-
-            getAccount = new Account(
-                    resultSet.getLong("account_id"),
-                    resultSet.getString("nickname"),
-                    resultSet.getString("email"),
-                    resultSet.getObject("join_at", LocalDate.class),
-                    resultSet.getObject("password_update_date",LocalDate.class),
-                    resultSet.getBoolean("alarm_change_password"),
-                    resultSet.getBoolean("receive_email")
-            );
-        }  catch (ClassNotFoundException | SQLException e) {
-            throw new DataAccessEsception(e);
-        } finally {
-            try {
-                if( resultSet != null) resultSet.close();
-                if (statement != null) statement.close();
-                if ( connection != null ) connection.close();
-            } catch (SQLException e){
-                throw new DataAccessEsception(e);
-            }
-        }
-
-        return getAccount;
+        JdbcContext jdbcContext = new JdbcContext(connectionMaker);
+        MapperRow<Account> mapperRow = resultSet -> new Account(
+                resultSet.getLong("account_id"),
+                resultSet.getString("nickname"),
+                resultSet.getString("email"),
+                resultSet.getObject("join_at", LocalDate.class),
+                resultSet.getObject("password_update_date", LocalDate.class),
+                resultSet.getBoolean("alarm_change_password"),
+                resultSet.getBoolean("receive_email"));
+        return jdbcContext.executeQueryInContext(query, mapperRow, id);
     }
 
     public List<AccountAdminResponse> findByAll(Page page){
-        Connection connection = null;
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
-        List<AccountAdminResponse> accountList = new CopyOnWriteArrayList<>();
-        try {
-            connection = connectionMaker.makeConnection();
+        StringBuilder query = new StringBuilder();
+        query.append("SELECT * FROM account a WHERE account_id  >= (SELECT COUNT(*) FROM account b)-? ");
+        query.append(" AND a.account_id < (SELECT COUNT(*) FROM account c)-? ORDER BY a.account_id ASC;");
 
-            StringBuilder query = new StringBuilder();
-            query.append("SELECT * FROM account a WHERE account_id  > (SELECT COUNT(*) FROM account b)-? ");
-            query.append(" AND a.account_id <= (SELECT COUNT(*) FROM account c)-? ORDER BY a.account_id ASC;");
-            statement = connection.prepareStatement(query.toString());
-            statement.setInt(1, page.totalRows());     // page 10개 기준
-            statement.setInt(2, page.currentPage());
-
-            resultSet = statement.executeQuery();
-
-            while(resultSet.next()) {
-                AccountAdminResponse account = new AccountAdminResponse();
-                account.setId(resultSet.getLong("account_id"));
-                account.setNickname(resultSet.getString("nickname"));
-                account.setEmail(resultSet.getString("email"));
-                account.setJoinedAt(resultSet.getObject("join_at", LocalDate.class));
-                account.setPasswordUpdateDate(resultSet.getObject("password_update_date", LocalDate.class));
-                account.setAlarmChangePassword(resultSet.getBoolean("alarm_change_password"));
-                account.setReceiveEmail(resultSet.getBoolean("receive_email"));
-
-                accountList.add(account);
-            }
-
-        }  catch (ClassNotFoundException | SQLException e) {
-            throw new DataAccessEsception(e);
-        } finally {
-            try {
-                if( resultSet != null) resultSet.close();
-                if (statement != null) statement.close();
-                if ( connection != null ) connection.close();
-            } catch (SQLException e){
-                throw new DataAccessEsception(e);
-            }
-        }
-        return accountList;
+        JdbcContext jdbcContext = new JdbcContext(connectionMaker);
+        MapperRow<AccountAdminResponse> mapperRow = resultSet -> {
+            AccountAdminResponse account = new AccountAdminResponse();
+            account.setId(resultSet.getLong("account_id"));
+            account.setNickname(resultSet.getString("nickname"));
+            account.setEmail(resultSet.getString("email"));
+            account.setJoinedAt(resultSet.getObject("join_at", LocalDate.class));
+            account.setPasswordUpdateDate(resultSet.getObject("password_update_date", LocalDate.class));
+            account.setAlarmChangePassword(resultSet.getBoolean("alarm_change_password"));
+            account.setReceiveEmail(resultSet.getBoolean("receive_email"));
+            return account;
+        };
+        return jdbcContext.executeQueryListInContext(query.toString(), mapperRow, page.totalRows(), page.currentPage());
     }
 
     public Account findByNickname(String nickname) {
-        Connection connection = null;
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
-        Account getAccount = null;
-
-        try {
-            connection = connectionMaker.makeConnection();
-
-            String sql = "select * from account where nickname=?";
-            statement = connection.prepareStatement(sql);
-            statement.setString(1, nickname);
-            resultSet = statement.executeQuery();
-
-            if(!resultSet.next()) return null;
-
-            getAccount = new Account(
-                    resultSet.getLong("account_id"),
-                    resultSet.getString("nickname"),
-                    resultSet.getString("email"),
-                    resultSet.getObject("join_at", LocalDate.class),
-                    resultSet.getObject("password_update_date",LocalDate.class),
-                    resultSet.getBoolean("alarm_change_password"),
-                    resultSet.getBoolean("receive_email")
-            );
-
-        }  catch (ClassNotFoundException | SQLException e) {
-            throw new DataAccessEsception(e);
-        } finally {
-            try {
-                if( resultSet != null) resultSet.close();
-                if (statement != null) statement.close();
-                if ( connection != null ) connection.close();
-            } catch (SQLException e){
-                throw new DataAccessEsception(e);
-            }
-        }
-        return getAccount;
+        String query = "select * from account where nickname=?";
+        JdbcContext jdbcContext = new JdbcContext(connectionMaker);
+        MapperRow<Account> mapperRow = resultSet -> new Account(
+                resultSet.getLong("account_id"),
+                resultSet.getString("nickname"),
+                resultSet.getString("email"),
+                resultSet.getObject("join_at", LocalDate.class),
+                resultSet.getObject("password_update_date", LocalDate.class),
+                resultSet.getBoolean("alarm_change_password"),
+                resultSet.getBoolean("receive_email"));
+        return jdbcContext.executeQueryInContext(query, mapperRow, nickname);
     }
 
 
-    public boolean existsByEmail(SignUpForm form){
-        Connection connection = null;
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
-        boolean result = false;
-
-        try {
-            connection = connectionMaker.makeConnection();
-            String query = "SELECT EXISTS (SELECT * FROM account WHERE email=?) as success;";
-            statement = connection.prepareStatement(query);
-            statement.setString(1, form.getEmail());
-            resultSet = statement.executeQuery();
-
-            if(!resultSet.next()) return result;
-            if(resultSet.getInt("success")==1) result = true;
-
-        }  catch (ClassNotFoundException | SQLException e) {
-            throw new DataAccessEsception(e);
-        } finally {
-            try {
-                if( resultSet != null) resultSet.close();
-                if (statement != null) statement.close();
-                if ( connection != null ) connection.close();
-            } catch (SQLException e){
-                throw new DataAccessEsception(e);
-            }
-        }
-        return result;
+    public boolean existsByEmail(String email){
+        String query = "SELECT EXISTS (SELECT * FROM account WHERE email=?) as success;";
+        JdbcContext jdbcContext = new JdbcContext(connectionMaker);
+        MapperRow<Integer> mapperRow = resultSet -> resultSet.getInt("success");
+        return jdbcContext.executeQueryInContext(query, mapperRow, email) == 1;
     }
 
-    public boolean existsByNickname(SignUpForm form){
-        Connection connection = null;
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
-        boolean result = false;
-
-        try {
-            connection = connectionMaker.makeConnection();
-            String query = "SELECT EXISTS (SELECT * FROM account WHERE nickname=?) as success;";
-            statement = connection.prepareStatement(query);
-            statement.setString(1, form.getNickname());
-            resultSet = statement.executeQuery();
-
-            if(!resultSet.next()) return result;
-            if(resultSet.getInt("success")==1) result = true;
-
-        } catch (ClassNotFoundException | SQLException e) {
-            throw new DataAccessEsception(e);
-        } finally {
-            try {
-                if( resultSet != null) resultSet.close();
-                if (statement != null) statement.close();
-                if ( connection != null ) connection.close();
-            } catch (SQLException e){
-                throw new DataAccessEsception(e);
-            }
-        }
-        return result;
+    public boolean existsByNickname(String nickname){
+        String query = "SELECT EXISTS (SELECT * FROM account WHERE nickname=?) as success;";
+        JdbcContext jdbcContext = new JdbcContext(connectionMaker);
+        MapperRow<Integer> mapperRow = resultSet -> resultSet.getInt("success");
+        return jdbcContext.executeQueryInContext(query, mapperRow, nickname) == 1;
     }
 
     @Override
@@ -258,18 +138,12 @@ public class AccountDao implements AccountRepository {
         return jdbcContext.executeUpdateInContext(query, account.getPassword(), account.getPasswordUpdateDate(),account.getId());
     }
 
-
     @Override
     public Boolean update(Account account) {
         String query = "UPDATE account SET nickname= ?, email= ?, receive_email= ? WHERE account_id=?";
         JdbcContext context = new JdbcContext(connectionMaker);
         return context.executeUpdateInContext(query, account.getNickname(), account.getEmail(), account.isReceiveEmail(), account.getId());
     }
-
-
-    // executeUpdate() , executeQuery()
-
-
 
     @Override
     public Boolean deleteById(Long id) {
@@ -282,7 +156,7 @@ public class AccountDao implements AccountRepository {
     public Boolean deleteAll() {
         String query = "truncate account";
         JdbcContext context = new JdbcContext(connectionMaker);
-        return context.executeUpdateInContext(query, null);
+        return context.executeUpdateInContext(query);
     }
 
 }

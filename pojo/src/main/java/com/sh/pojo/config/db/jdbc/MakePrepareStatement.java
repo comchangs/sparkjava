@@ -1,4 +1,4 @@
-package com.sh.pojo.config.db.common;
+package com.sh.pojo.config.db.jdbc;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

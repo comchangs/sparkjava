@@ -24,8 +24,8 @@ public class AccountService {
     }
 
     public boolean isValidSignUp(SignUpForm form) {
-        return !accountRepository.existsByNickname(form) &&
-                !accountRepository.existsByEmail(form);
+        return !accountRepository.existsByNickname(form.getNickname()) &&
+                !accountRepository.existsByEmail(form.getEmail());
     }
 
     public boolean joined(SignUpForm form) {

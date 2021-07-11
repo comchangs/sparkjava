@@ -2,7 +2,6 @@ package com.sh.pojo.account;
 
 import com.sh.pojo.account.domain.Account;
 import com.sh.pojo.account.domain.form.AccountAdminResponse;
-import com.sh.pojo.account.domain.form.SignUpForm;
 import com.sh.pojo.common.Page;
 import com.sh.pojo.config.db.Repository;
 
@@ -14,9 +13,9 @@ public interface AccountRepository extends Repository<Account, Long> {
 
     Account findByNickname(String nickname);
 
-    boolean existsByNickname(SignUpForm form);
+    boolean existsByNickname(String nickname);
 
-    boolean existsByEmail(SignUpForm form);
+    boolean existsByEmail(String email);
 
     Boolean updatePassword(Account account);
 }
