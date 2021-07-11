@@ -6,7 +6,7 @@ public interface Repository<T, G> {
 
     boolean save(T obj);
 
-    Object findById(G id);
+    T findById(G id);
 
 //    List<T> findByAll();
 

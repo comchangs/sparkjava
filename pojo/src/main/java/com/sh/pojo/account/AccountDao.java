@@ -6,14 +6,12 @@ import com.sh.pojo.account.domain.form.SignUpForm;
 import com.sh.pojo.common.Page;
 import com.sh.pojo.config.db.ConnectionMaker;
 import com.sh.pojo.config.db.common.JdbcContext;
-import com.sh.pojo.config.db.common.MakePrepareStatement;
 import com.sh.pojo.config.db.exception.DataAccessEsception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -26,30 +24,14 @@ public class AccountDao implements AccountRepository {
         this.connectionMaker = connectionMaker;
     }
 
-    public void create() {
-        Connection connection = null;
-        Statement statement = null;
+    public Boolean create() {
 
-        try {
-            connection = connectionMaker.makeConnection();
-            StringBuilder query = new StringBuilder();
-            query.append("CREATE TABLE account (account_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, nickname varchar(20) NOT NULL, password varchar(255) NOT NULL");
-            query.append(", email varchar(50) NOT NULL, join_at datetime(6), password_update_date datetime(6), alarm_change_password datetime(6), receive_email bit(1) );");
+        StringBuilder query = new StringBuilder();
+        query.append("CREATE TABLE account (account_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, nickname varchar(20) NOT NULL, password varchar(255) NOT NULL");
+        query.append(", email varchar(50) NOT NULL, join_at datetime(6), password_update_date datetime(6), alarm_change_password datetime(6), receive_email bit(1) );");
 
-            statement = connection.createStatement();
-            int result = statement.executeUpdate(query.toString());
-
-        }  catch (ClassNotFoundException | SQLException e) {
-            throw new DataAccessEsception(e);
-        } finally {
-            try {
-                if (statement != null) statement.close();
-                if ( connection != null ) connection.close();
-            } catch (SQLException e){
-                throw new DataAccessEsception(e);
-            }
-
-        }
+        JdbcContext context = new JdbcContext(connectionMaker);
+        return context.executeUpdateInContext(query.toString(), null);
     }
 
     @Override
@@ -270,31 +252,10 @@ public class AccountDao implements AccountRepository {
 
     @Override
     public Boolean updatePassword(Account account) {
-        Connection connection = null;
-        PreparedStatement statement = null;
+        String query = "UPDATE account SET password= ?, password_update_date= ? WHERE account_id=?";
 
-        try {
-            connection = connectionMaker.makeConnection();
-            String query = "UPDATE account SET password= ?, password_update_date= ? WHERE account_id=?";
-            statement = connection.prepareStatement(query);
-            statement.setString(1,account.getPassword());
-            statement.setObject(2,account.getPasswordUpdateDate());
-            statement.setLong(3, account.getId());
-
-            int result = statement.executeUpdate();
-            if(result!=1) return false;
-
-        } catch (ClassNotFoundException | SQLException e) {
-            throw new DataAccessEsception(e);
-        } finally {
-            try {
-                if (statement != null) statement.close();
-                if ( connection != null ) connection.close();
-            } catch (SQLException e){
-                throw new DataAccessEsception(e);
-            }
-        }
-        return true;
+        JdbcContext jdbcContext = new JdbcContext(connectionMaker);
+        return jdbcContext.executeUpdateInContext(query, account.getPassword(), account.getPasswordUpdateDate(),account.getId());
     }
 
 
@@ -302,7 +263,7 @@ public class AccountDao implements AccountRepository {
     public Boolean update(Account account) {
         String query = "UPDATE account SET nickname= ?, email= ?, receive_email= ? WHERE account_id=?";
         JdbcContext context = new JdbcContext(connectionMaker);
-        return context.executeUpdateInJdbc(query, account);
+        return context.executeUpdateInContext(query, account.getNickname(), account.getEmail(), account.isReceiveEmail(), account.getId());
     }
 
 
@@ -312,48 +273,16 @@ public class AccountDao implements AccountRepository {
 
     @Override
     public Boolean deleteById(Long id) {
-        Connection connection = null;
-        PreparedStatement statement = null;
-        int result = 0;
-        try {
-            connection = connectionMaker.makeConnection();
-            String sql = "DELETE FROM account WHERE account_id=?";
-            statement = connection.prepareStatement(sql);
-            statement.setLong(1,id);
-            result = statement.executeUpdate();
-        }  catch (ClassNotFoundException | SQLException e) {
-            throw new DataAccessEsception(e);
-        } finally {
-            try {
-                if (statement != null) statement.close();
-                if ( connection != null ) connection.close();
-            } catch (SQLException e){
-                throw new DataAccessEsception(e);
-            }
-        }
-        return result>0;
+        String query = "DELETE FROM account WHERE account_id=?";
+        JdbcContext context = new JdbcContext(connectionMaker);
+        return context.executeUpdateInContext(query, id);
     }
 
     @Override
     public Boolean deleteAll() {
-        Connection connection = null;
-        PreparedStatement statement = null;
-        try {
-            connection = connectionMaker.makeConnection();
-            String sql = "truncate account;";
-            statement = connection.prepareStatement(sql);
-            statement.executeUpdate();
-        }  catch (ClassNotFoundException | SQLException e) {
-            throw new DataAccessEsception(e);
-        } finally {
-            try {
-                if (statement != null) statement.close();
-                if ( connection != null ) connection.close();
-            } catch (SQLException e){
-                throw new DataAccessEsception(e);
-            }
-        }
-        return true;
+        String query = "truncate account";
+        JdbcContext context = new JdbcContext(connectionMaker);
+        return context.executeUpdateInContext(query, null);
     }
 
 }

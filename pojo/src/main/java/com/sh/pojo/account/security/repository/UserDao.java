@@ -56,7 +56,7 @@ public class UserDao implements UserRepository {
     }
 
     @Override
-    public Object findById(Long id) {
+    public User findById(Long id) {
         return null;
     }
 

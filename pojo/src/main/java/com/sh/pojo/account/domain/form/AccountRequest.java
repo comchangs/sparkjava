@@ -1,6 +1,5 @@
 package com.sh.pojo.account.domain.form;
 
-import java.time.LocalDate;
 
 public class AccountRequest {
     private Long id;
@@ -15,10 +14,6 @@ public class AccountRequest {
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getNickname() {
