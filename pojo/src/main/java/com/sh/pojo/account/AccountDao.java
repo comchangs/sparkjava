@@ -24,7 +24,6 @@ public class AccountDao implements AccountRepository {
     }
 
     public Boolean create() {
-
         StringBuilder query = new StringBuilder();
         query.append("CREATE TABLE account (account_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, nickname varchar(20) NOT NULL, password varchar(255) NOT NULL");
         query.append(", email varchar(50) NOT NULL, join_at datetime(6), password_update_date datetime(6), alarm_change_password datetime(6), receive_email bit(1) );");
@@ -114,7 +113,6 @@ public class AccountDao implements AccountRepository {
                 resultSet.getBoolean("receive_email"));
         return jdbcContext.executeQueryInContext(query, mapperRow, nickname);
     }
-
 
     public boolean existsByEmail(String email){
         String query = "SELECT EXISTS (SELECT * FROM account WHERE email=?) as success;";

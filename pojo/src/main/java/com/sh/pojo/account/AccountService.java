@@ -5,7 +5,7 @@ import com.sh.pojo.account.domain.form.*;
 import com.sh.pojo.account.exception.AccountNotFoundException;
 import com.sh.pojo.common.Page;
 import com.sh.pojo.config.PasswordHashing;
-import com.sh.pojo.config.db.DaoFactory;
+import com.sh.pojo.config.db.Dao;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
 
-    private static final AccountService accountService = new AccountService(DaoFactory.getInstance(AccountRepository.class));
+    private static final AccountService accountService = new AccountService(Dao.getInstance(AccountRepository.class));
 
     private AccountService(AccountRepository accountRepository){
         this.accountRepository = accountRepository;

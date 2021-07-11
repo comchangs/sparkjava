@@ -1,7 +1,5 @@
 package com.sh.pojo.config.db.jdbc;
 
-import com.sh.pojo.account.domain.Account;
-import com.sh.pojo.account.domain.form.AccountAdminResponse;
 import com.sh.pojo.config.db.ConnectionMaker;
 import com.sh.pojo.config.db.exception.DataAccessEsception;
 import org.slf4j.Logger;
@@ -11,7 +9,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -33,7 +30,6 @@ public class JdbcContext {
 
             makePrepareStatement.setParameters(statement);
             int result = statement.executeUpdate();
-
             //either (1) the row count for INSERT, UPDATE, or DELETE statements or (2) 0 for SQL statements that return nothing
             return result>=0;
         }  catch (ClassNotFoundException | SQLException e) {

@@ -5,7 +5,7 @@ import com.sh.pojo.account.domain.Account;
 import com.sh.pojo.account.domain.form.AccountAdminResponse;
 import com.sh.pojo.account.domain.form.AccountRequest;
 import com.sh.pojo.common.Page;
-import com.sh.pojo.config.db.DaoFactory;
+import com.sh.pojo.config.db.Dao;
 import org.junit.jupiter.api.*;
 
 import java.util.List;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class AccountDaoTest {
 
     Account account;
-    AccountRepository accountRepository = DaoFactory.getInstance(AccountRepository.class);
+    AccountRepository accountRepository = Dao.getInstance(AccountRepository.class);
     private String nickname = "sunhwa07";
     private String email = "test07@email.com";
     private String pwd = "pass1234";

@@ -6,7 +6,9 @@ import java.sql.SQLException;
 public interface ConnectionMaker {
 
     // 규약
-    public Connection makeConnection() throws ClassNotFoundException, SQLException;
+    Connection makeConnection() throws ClassNotFoundException, SQLException;
 
+    void returnConnection(Connection conn);
 
+    void close();
 }
