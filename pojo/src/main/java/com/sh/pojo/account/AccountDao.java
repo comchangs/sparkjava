@@ -5,6 +5,9 @@ import com.sh.pojo.account.domain.form.AccountAdminResponse;
 import com.sh.pojo.account.domain.form.SignUpForm;
 import com.sh.pojo.common.Page;
 import com.sh.pojo.config.db.ConnectionMaker;
+import com.sh.pojo.config.db.exception.DataAccessEsception;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -12,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class AccountDao implements AccountRepository {
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final ConnectionMaker connectionMaker;
 
@@ -30,28 +34,18 @@ public class AccountDao implements AccountRepository {
             query.append(", email varchar(50) NOT NULL, join_at datetime(6), password_update_date datetime(6), alarm_change_password datetime(6), receive_email bit(1) );");
 
             statement = connection.createStatement();
-
             int result = statement.executeUpdate(query.toString());
 
-        }  catch (ClassNotFoundException e1) {
-            e1.printStackTrace();
-        } catch (SQLException e) {
-            System.out.println("error of account's create query");
+        }  catch (ClassNotFoundException | SQLException e) {
+            throw new DataAccessEsception(e);
         } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    // here not throw out, complete for connection close
-                }
+            try {
+                if (statement != null) statement.close();
+                if ( connection != null ) connection.close();
+            } catch (SQLException e){
+                throw new DataAccessEsception(e);
             }
-            if ( connection != null ) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
 
-                }
-            }
         }
     }
 
@@ -74,25 +68,14 @@ public class AccountDao implements AccountRepository {
             int result = statement.executeUpdate();
             if(result!=1) return false;
 
-        }  catch (ClassNotFoundException e1) {
-            e1.printStackTrace();
-        } catch (SQLException e) {
-            System.out.println("account save 에러");
+        }  catch (ClassNotFoundException | SQLException e) {
+            throw new DataAccessEsception(e);
         } finally {
-            if (statement != null ) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-            if ( connection != null ) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-
-                }
+            try {
+                if (statement != null) statement.close();
+                if ( connection != null ) connection.close();
+            } catch (SQLException e){
+                throw new DataAccessEsception(e);
             }
         }
         return true;
@@ -122,23 +105,15 @@ public class AccountDao implements AccountRepository {
                     resultSet.getBoolean("alarm_change_password"),
                     resultSet.getBoolean("receive_email")
             );
-        }catch (ClassNotFoundException | SQLException e1) {
-            System.out.println(" error of account findById ");
+        }  catch (ClassNotFoundException | SQLException e) {
+            throw new DataAccessEsception(e);
         } finally {
-            if (statement != null ) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-            if ( connection != null ) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-
-                }
+            try {
+                if( resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if ( connection != null ) connection.close();
+            } catch (SQLException e){
+                throw new DataAccessEsception(e);
             }
         }
 
@@ -150,7 +125,6 @@ public class AccountDao implements AccountRepository {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         List<AccountAdminResponse> accountList = new CopyOnWriteArrayList<>();
-
         try {
             connection = connectionMaker.makeConnection();
 
@@ -176,23 +150,15 @@ public class AccountDao implements AccountRepository {
                 accountList.add(account);
             }
 
-        }catch (ClassNotFoundException | SQLException e1) {
-            System.out.println(" error of account list");
+        }  catch (ClassNotFoundException | SQLException e) {
+            throw new DataAccessEsception(e);
         } finally {
-            if (statement != null ) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-            if ( connection != null ) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-
-                }
+            try {
+                if( resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if ( connection != null ) connection.close();
+            } catch (SQLException e){
+                throw new DataAccessEsception(e);
             }
         }
         return accountList;
@@ -224,29 +190,15 @@ public class AccountDao implements AccountRepository {
                     resultSet.getBoolean("receive_email")
             );
 
-        }catch (ClassNotFoundException | SQLException e1) {
-            System.out.println("account nickname 조회 오류");
+        }  catch (ClassNotFoundException | SQLException e) {
+            throw new DataAccessEsception(e);
         } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    // here not throw out, complete for connection close
-                }
-            }
-            if  (resultSet != null) {
-                try {
-                    resultSet.close();
-                } catch (SQLException e) {
-                    // here not throw out, complete for connection close
-                }
-            }
-            if ( connection != null ) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-
-                }
+            try {
+                if( resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if ( connection != null ) connection.close();
+            } catch (SQLException e){
+                throw new DataAccessEsception(e);
             }
         }
         return getAccount;
@@ -269,22 +221,15 @@ public class AccountDao implements AccountRepository {
             if(!resultSet.next()) return result;
             if(resultSet.getInt("success")==1) result = true;
 
-        }  catch (ClassNotFoundException | SQLException e1) {
-            System.out.println("account existByEmail 에러");
+        }  catch (ClassNotFoundException | SQLException e) {
+            throw new DataAccessEsception(e);
         } finally {
-            if (statement != null ) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if ( connection != null ) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-
-                }
+            try {
+                if( resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if ( connection != null ) connection.close();
+            } catch (SQLException e){
+                throw new DataAccessEsception(e);
             }
         }
         return result;
@@ -306,22 +251,15 @@ public class AccountDao implements AccountRepository {
             if(!resultSet.next()) return result;
             if(resultSet.getInt("success")==1) result = true;
 
-        }  catch (ClassNotFoundException | SQLException e1) {
-            System.out.println("account existByNickname 에러");
+        } catch (ClassNotFoundException | SQLException e) {
+            throw new DataAccessEsception(e);
         } finally {
-            if (statement != null ) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if ( connection != null ) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-
-                }
+            try {
+                if( resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if ( connection != null ) connection.close();
+            } catch (SQLException e){
+                throw new DataAccessEsception(e);
             }
         }
         return result;
@@ -343,23 +281,14 @@ public class AccountDao implements AccountRepository {
             int result = statement.executeUpdate();
             if(result!=1) return false;
 
-        }  catch (ClassNotFoundException | SQLException e1) {
-            e1.printStackTrace();
+        } catch (ClassNotFoundException | SQLException e) {
+            throw new DataAccessEsception(e);
         } finally {
-            if (statement != null ) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-            if ( connection != null ) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-
-                }
+            try {
+                if (statement != null) statement.close();
+                if ( connection != null ) connection.close();
+            } catch (SQLException e){
+                throw new DataAccessEsception(e);
             }
         }
         return true;
@@ -382,23 +311,14 @@ public class AccountDao implements AccountRepository {
 
             int result = statement.executeUpdate();
             if(result!=1) return false;
-        }  catch (ClassNotFoundException | SQLException e1) {
-            e1.printStackTrace();
+        }  catch (ClassNotFoundException | SQLException e) {
+            throw new DataAccessEsception(e);
         } finally {
-            if (statement != null ) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-            if ( connection != null ) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-
-                }
+            try {
+                if (statement != null) statement.close();
+                if ( connection != null ) connection.close();
+            } catch (SQLException e){
+                throw new DataAccessEsception(e);
             }
         }
         return true;
@@ -415,23 +335,14 @@ public class AccountDao implements AccountRepository {
             statement = connection.prepareStatement(sql);
             statement.setLong(1,id);
             result = statement.executeUpdate();
-        } catch (ClassNotFoundException | SQLException e1) {
-            System.out.println("error : account deleteById ");
+        }  catch (ClassNotFoundException | SQLException e) {
+            throw new DataAccessEsception(e);
         } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    // here not throw out, complete for connection close
-                }
-            }
-            if ( connection != null ) {
-                try {
-                    connection.close();
-                    System.out.println("account deleteById OK");
-                } catch (SQLException e) {
-
-                }
+            try {
+                if (statement != null) statement.close();
+                if ( connection != null ) connection.close();
+            } catch (SQLException e){
+                throw new DataAccessEsception(e);
             }
         }
         return result;
@@ -446,23 +357,14 @@ public class AccountDao implements AccountRepository {
             String sql = "truncate account;";
             statement = connection.prepareStatement(sql);
             statement.executeUpdate();
-        } catch (ClassNotFoundException | SQLException e1) {
-            System.out.println("account 삭제 오류");
+        }  catch (ClassNotFoundException | SQLException e) {
+            throw new DataAccessEsception(e);
         } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    // here not throw out, complete for connection close
-                }
-            }
-            if ( connection != null ) {
-                try {
-                    connection.close();
-                    System.out.println("삭제 완료");
-                } catch (SQLException e) {
-
-                }
+            try {
+                if (statement != null) statement.close();
+                if ( connection != null ) connection.close();
+            } catch (SQLException e){
+                throw new DataAccessEsception(e);
             }
         }
     }

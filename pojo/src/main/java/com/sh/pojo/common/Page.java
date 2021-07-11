@@ -6,12 +6,20 @@ public class Page {
 
     private Integer pageLimit;
 
+    public Page() {
+    }
+
+    public Page(Integer page, Integer pageLimit) {
+        setPage(page);
+        setPageLimit(pageLimit);
+    }
+
     public Integer getPage() {
         return page;
     }
 
-    public void setPage(Integer page) {
-        this.page = (this.page == 0) ? 1: page;
+    private void setPage(Integer page) {
+        this.page = (page == 0) ? 1: page;
     }
 
     private Integer getPageLimit() {

@@ -2,6 +2,7 @@ package com.sh.pojo;
 
 import com.sh.pojo.account.AccountRepository;
 import com.sh.pojo.account.domain.Account;
+import com.sh.pojo.common.Page;
 import com.sh.pojo.config.db.DaoFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +30,7 @@ class AccountDaoTest {
     }
 
     @Test
-    @DisplayName("사용자 - 저장, 조건조회, id 조회, 비밀번호 수정")
+    @DisplayName("account_저장,조회,수정")
     void accountDaoCRUD()  {
         // 저장, 조회
         accountRepository.save(account);
@@ -44,5 +45,12 @@ class AccountDaoTest {
         // 수정 데이터 확인
         Account checkResult = (Account) accountRepository.findById(getAccount.getId());
         assertNotEquals(checkResult.getPassword(), getAccount.getPassword());
+    }
+
+    @Test
+    @DisplayName("account_목록")
+    void accountDadList() {
+        Page page = new Page(1,10);
+        accountRepository.findByAll(page);
     }
 }

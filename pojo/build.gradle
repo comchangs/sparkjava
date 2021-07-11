@@ -13,6 +13,7 @@ repositories {
 dependencies {
 	implementation  'com.sparkjava:spark-core:2.9.3'
 	implementation 'com.google.code.gson:gson:2.8.7'
+	implementation 'org.slf4j:slf4j-simple:1.7.21'
 	implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.25'
 }
 
