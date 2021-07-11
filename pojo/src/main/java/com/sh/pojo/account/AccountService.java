@@ -53,8 +53,8 @@ public class AccountService {
 
     public boolean signOut(Long id) {
         getAccountById(id);
-        int result = accountRepository.deleteById(id);
-        return result > 0;
+        Boolean result = accountRepository.deleteById(id);
+        return result;
     }
 
     public void modifyPassword(PasswordForm password) {

@@ -66,12 +66,13 @@ public class UserDao implements UserRepository {
     }
 
     @Override
-    public Integer deleteById(Long id) {
+    public Boolean deleteById(Long id) {
         return null;
     }
 
     @Override
-    public void deleteAll() {
+    public Boolean deleteAll() {
+        return null;
 
     }
 }

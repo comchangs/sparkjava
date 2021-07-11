@@ -2,12 +2,15 @@ package com.sh.pojo;
 
 import com.sh.pojo.account.AccountRepository;
 import com.sh.pojo.account.domain.Account;
+import com.sh.pojo.account.domain.form.AccountAdminResponse;
 import com.sh.pojo.common.Page;
 import com.sh.pojo.config.db.DaoFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,10 +27,10 @@ class AccountDaoTest {
         account = Account.createNewAccount(nickname, email, pwd);
     }
 
-    @AfterEach
-    void afterEach() {
-        accountRepository.deleteAll();
-    }
+//    @AfterEach
+//    void afterEach() {
+//        accountRepository.deleteAll();
+//    }
 
     @Test
     @DisplayName("account_저장,조회,수정")
@@ -51,6 +54,7 @@ class AccountDaoTest {
     @DisplayName("account_목록")
     void accountDadList() {
         Page page = new Page(1,10);
-        accountRepository.findByAll(page);
+        List<AccountAdminResponse> byAll = accountRepository.findByAll(page);
+        assertTrue(byAll.size()>0);
     }
 }

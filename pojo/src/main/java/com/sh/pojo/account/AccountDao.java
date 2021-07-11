@@ -5,12 +5,15 @@ import com.sh.pojo.account.domain.form.AccountAdminResponse;
 import com.sh.pojo.account.domain.form.SignUpForm;
 import com.sh.pojo.common.Page;
 import com.sh.pojo.config.db.ConnectionMaker;
+import com.sh.pojo.config.db.common.JdbcContext;
+import com.sh.pojo.config.db.common.MakePrepareStatement;
 import com.sh.pojo.config.db.exception.DataAccessEsception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -297,35 +300,18 @@ public class AccountDao implements AccountRepository {
 
     @Override
     public Boolean update(Account account) {
-        Connection connection = null;
-        PreparedStatement statement = null;
-
-        try {
-            connection = connectionMaker.makeConnection();
-            String query = "UPDATE account SET nickname= ?, email= ?, receive_email= ? WHERE account_id=?";
-            statement = connection.prepareStatement(query);
-            statement.setString(1,account.getNickname());
-            statement.setObject(2,account.getEmail());
-            statement.setBoolean(3,account.isReceiveEmail());
-            statement.setLong(4, account.getId());
-
-            int result = statement.executeUpdate();
-            if(result!=1) return false;
-        }  catch (ClassNotFoundException | SQLException e) {
-            throw new DataAccessEsception(e);
-        } finally {
-            try {
-                if (statement != null) statement.close();
-                if ( connection != null ) connection.close();
-            } catch (SQLException e){
-                throw new DataAccessEsception(e);
-            }
-        }
-        return true;
+        String query = "UPDATE account SET nickname= ?, email= ?, receive_email= ? WHERE account_id=?";
+        JdbcContext context = new JdbcContext(connectionMaker);
+        return context.executeUpdateInJdbc(query, account);
     }
 
+
+    // executeUpdate() , executeQuery()
+
+
+
     @Override
-    public Integer deleteById(Long id) {
+    public Boolean deleteById(Long id) {
         Connection connection = null;
         PreparedStatement statement = null;
         int result = 0;
@@ -345,11 +331,11 @@ public class AccountDao implements AccountRepository {
                 throw new DataAccessEsception(e);
             }
         }
-        return result;
+        return result>0;
     }
 
     @Override
-    public void deleteAll() {
+    public Boolean deleteAll() {
         Connection connection = null;
         PreparedStatement statement = null;
         try {
@@ -367,7 +353,7 @@ public class AccountDao implements AccountRepository {
                 throw new DataAccessEsception(e);
             }
         }
+        return true;
     }
-
 
 }
