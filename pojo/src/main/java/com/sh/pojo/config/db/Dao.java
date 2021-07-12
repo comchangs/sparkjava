@@ -4,7 +4,10 @@ import com.sh.pojo.account.AccountDao;
 import com.sh.pojo.account.AccountRepository;
 import com.sh.pojo.account.security.repository.UserDao;
 import com.sh.pojo.account.security.repository.UserRepository;
+import com.sh.pojo.config.db.dbcp.DBConnectionManager;
+import com.sh.pojo.config.db.dbcp.DBConnectionPool;
 
+import java.sql.DriverManager;
 import java.util.Objects;
 
 
@@ -33,7 +36,7 @@ public class Dao implements DaoFactory{
     }
 
     private static ConnectionMaker makeConnection() {
-        ConnectionMaker makeConnection = new LocalConnectionMaker();
-        return makeConnection;
+//        ConnectionMaker makeConnection = new LocalConnectionMaker();
+        return DBConnectionManager.getInstance();
     }
 }

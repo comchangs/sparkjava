@@ -39,3 +39,4 @@ out/
 
 ### db info ###
 LocalConnectionMaker.java
+AppConfig.java

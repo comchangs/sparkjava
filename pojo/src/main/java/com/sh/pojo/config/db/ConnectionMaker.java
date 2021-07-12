@@ -8,7 +8,7 @@ public interface ConnectionMaker {
     // 규약
     Connection makeConnection() throws ClassNotFoundException, SQLException;
 
-    void returnConnection(Connection conn);
+    boolean returnConnection(Connection conn);
 
     void close();
 }

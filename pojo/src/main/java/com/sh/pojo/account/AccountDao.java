@@ -5,7 +5,7 @@ import com.sh.pojo.account.domain.form.AccountAdminResponse;
 import com.sh.pojo.common.Page;
 import com.sh.pojo.config.db.ConnectionMaker;
 import com.sh.pojo.config.db.jdbc.JdbcContext;
-import com.sh.pojo.config.db.exception.DataAccessEsception;
+import com.sh.pojo.config.db.exception.DataAccessException;
 import com.sh.pojo.config.db.jdbc.MapperRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,13 +52,13 @@ public class AccountDao implements AccountRepository {
             if(result!=1) return false;
 
         }  catch (ClassNotFoundException | SQLException e) {
-            throw new DataAccessEsception(e);
+            throw new DataAccessException(e);
         } finally {
             try {
                 if (statement != null) statement.close();
                 if ( connection != null ) connection.close();
             } catch (SQLException e){
-                throw new DataAccessEsception(e);
+                throw new DataAccessException(e);
             }
         }
         return true;

@@ -1,7 +1,7 @@
 package com.sh.pojo.config.db.jdbc;
 
 import com.sh.pojo.config.db.ConnectionMaker;
-import com.sh.pojo.config.db.exception.DataAccessEsception;
+import com.sh.pojo.config.db.exception.DataAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,13 +33,16 @@ public class JdbcContext {
             //either (1) the row count for INSERT, UPDATE, or DELETE statements or (2) 0 for SQL statements that return nothing
             return result>=0;
         }  catch (ClassNotFoundException | SQLException e) {
-            throw new DataAccessEsception(e);
+            throw new DataAccessException(e);
         } finally {
             try {
                 if (statement != null) statement.close();
-                if ( connection != null ) connection.close();
+                if ( connection != null ) {
+                    //connection.close();
+                    connectionMaker.returnConnection(connection);
+                }
             } catch (SQLException e){
-                throw new DataAccessEsception(e);
+                throw new DataAccessException(e);
             }
         }
     }
@@ -75,14 +78,17 @@ public class JdbcContext {
             return accountList;
 
         }  catch (ClassNotFoundException | SQLException e) {
-            throw new DataAccessEsception(e);
+            throw new DataAccessException(e);
         } finally {
             try {
                 if( resultSet != null) resultSet.close();
                 if (statement != null) statement.close();
-                if ( connection != null ) connection.close();
+                if ( connection != null ) {
+                    //connection.close();
+                    connectionMaker.returnConnection(connection);
+                }
             } catch (SQLException e){
-                throw new DataAccessEsception(e);
+                throw new DataAccessException(e);
             }
         }
 
