@@ -24,6 +24,7 @@ personal, 2021.07/06 ~ ing
   * DB connection information
   
 ### how to Run
+* AppConfigEx -> AppConfig, and input DB connection information
 * Main
   * run application 
   * http://localhost:4567/api/ + request

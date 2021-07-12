@@ -22,16 +22,16 @@ public class DBConnectionPool implements ConnectionPool{
     private static final int MAX_POOL_SIZE = 10;
     private static final int MAX_TIMEOUT = 5;
 
-    public static DBConnectionPool create(String url, String user, String password) {
+    public static DBConnectionPool create(DBConnectionInfo dbConnectionInfo) {
         LinkedBlockingQueue<Connection> pool = new LinkedBlockingQueue<Connection>(MAX_POOL_SIZE);
         for (int i = 0; i < INITIAL_POOL_SIZE; i++) {
             try {
-                pool.add(makeConnection(url, user, password));
+                pool.add(makeConnection(dbConnectionInfo.getUrl(), dbConnectionInfo.getId(), dbConnectionInfo.getPassword()));
             } catch (SQLException throwables) {
                 throw new DbConnectionException(throwables);
             }
         }
-        return new DBConnectionPool(url, user, password, pool);
+        return new DBConnectionPool(dbConnectionInfo.getUrl(), dbConnectionInfo.getId(), dbConnectionInfo.getPassword(), pool);
     }
 
     public DBConnectionPool(String url, String user, String password, LinkedBlockingQueue<Connection> connectionPool) {
