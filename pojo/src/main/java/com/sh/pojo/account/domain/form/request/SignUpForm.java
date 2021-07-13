@@ -1,4 +1,4 @@
-package com.sh.pojo.account.domain.form;
+package com.sh.pojo.account.domain.form.request;
 
 public class SignUpForm {
 

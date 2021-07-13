@@ -1,16 +1,19 @@
 package com.sh.pojo.account;
 
 import com.google.gson.Gson;
-import com.sh.pojo.account.domain.Account;
 import com.sh.pojo.account.domain.form.AccountAdminResponse;
 import com.sh.pojo.account.domain.form.AccountResponse;
-import com.sh.pojo.account.domain.form.PasswordForm;
-import com.sh.pojo.account.domain.form.SignUpForm;
+import com.sh.pojo.account.domain.form.request.LoginRequest;
+import com.sh.pojo.account.domain.form.request.PasswordForm;
+import com.sh.pojo.account.domain.form.request.SignUpForm;
+import com.sh.pojo.account.security.domain.Authentication;
 import com.sh.pojo.common.Page;
 import com.sh.pojo.config.network.response.Response;
+import spark.Session;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.stream.DoubleStream;
+import java.util.Set;
 
 import static com.sh.pojo.config.network.response.JsonUtil.jsend;
 import static com.sh.pojo.config.network.response.JsonUtil.json;
@@ -22,13 +25,32 @@ public class AccountApiController {
 
         path("/api",() -> {
             path("/", () -> {
-
-                post("/register", "application/json", (req, res) -> {
+                post("/register", "application/json", (request, response) -> {
                     Gson gson = new Gson();
-                    SignUpForm signUpForm = gson.fromJson(req.body(), SignUpForm.class);
-                    boolean joined = accountService.joined(signUpForm);
-                    res.status(201);
+                    SignUpForm signUpForm = gson.fromJson(request.body(), SignUpForm.class);
+                    boolean validSignUp = accountService.isValidSignUp(signUpForm);
+                    if(!validSignUp) {
+                        response.status(400);
+                        return Response.FAIL(jsend("nickname or email", "Information is duplicated"));
+                    }
+                    if(!accountService.joined(signUpForm)) {
+                        response.status(404); // 500
+                        return Response.ERROR("Unable to communicate with database");
+                    }
+                    response.status(201);
                     return Response.OK(jsend("register", signUpForm));
+                }, json());
+
+                post("/login", "application/json", (request, response) -> {
+                    Session session = request.session();
+                    if(!session.isNew()){
+                        System.out.println("no logout, retry login : session update >> ");
+                    }
+                    Gson gson = new Gson();
+                    LoginRequest loginRequest = gson.fromJson(request.body(), LoginRequest.class);
+                    Authentication authentication = accountService.login(loginRequest);
+                    session.attribute("user",authentication.getSessionId());
+                    return Response.OK();
                 }, json());
 
                 delete("/signOut/:id", (request, response) -> {
@@ -52,7 +74,6 @@ public class AccountApiController {
                 // 관리자
                 get("", "application/json", (request, response) -> {
                     Gson gson = new Gson();
-                    System.out.println(request.body());
                     Page page = gson.fromJson(request.body(), Page.class);
                     List<AccountAdminResponse> getAccount = accountService.getAccountList(page);
                     return Response.OK(jsend("accounts", getAccount));

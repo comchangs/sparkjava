@@ -59,8 +59,8 @@ public class Response {
         return new Response(ResponseStatus.SUCCESS, data);
     }
 
-    public static Response FAIL(JsonElement message) {
-        return new Response(ResponseStatus.FAIL, message);
+    public static Response FAIL(JsonElement data) {
+        return new Response(ResponseStatus.FAIL, data);
     }
 
     public static Response ERROR(String message) {

@@ -3,7 +3,7 @@ package com.sh.pojo;
 import com.sh.pojo.account.AccountRepository;
 import com.sh.pojo.account.domain.Account;
 import com.sh.pojo.account.domain.form.AccountAdminResponse;
-import com.sh.pojo.account.domain.form.AccountRequest;
+import com.sh.pojo.account.domain.form.request.AccountRequest;
 import com.sh.pojo.common.Page;
 import com.sh.pojo.config.db.Dao;
 import org.junit.jupiter.api.*;
@@ -97,9 +97,6 @@ class AccountDaoTest {
     void accountDadList() {
         Page page = new Page(1,10);
         List<AccountAdminResponse> byAll = accountRepository.findByAll(page);
-/*        for (AccountAdminResponse account : byAll) {
-            System.out.println(account.toString());
-        }*/
         assertTrue(byAll.size()>2);
     }
 

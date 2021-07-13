@@ -11,11 +11,14 @@ public interface AccountRepository extends Repository<Account, Long> {
 
     List<AccountAdminResponse> findByAll(Page pageNumber);
 
-    Account findByNickname(String nickname);
-
     boolean existsByNickname(String nickname);
 
     boolean existsByEmail(String email);
 
     Boolean updatePassword(Account account);
+
+    Account findByNickname(String nickname);
+
+    Account findByEmail(String email);
+
 }

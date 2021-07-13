@@ -50,7 +50,6 @@ public class AccountDao implements AccountRepository {
             statement.setBoolean(7,account.isReceiveEmail());
             int result = statement.executeUpdate();
             if(result!=1) return false;
-
         }  catch (ClassNotFoundException | SQLException e) {
             throw new DataAccessException(e);
         } finally {
@@ -100,8 +99,10 @@ public class AccountDao implements AccountRepository {
         return jdbcContext.executeQueryListInContext(query.toString(), mapperRow, page.totalRows(), page.currentPage());
     }
 
-    public Account findByNickname(String nickname) {
-        String query = "select * from account where nickname=?";
+    public Account findByNicknameOrEmail(String columnName, String columnValue ) {
+        StringBuilder query = new StringBuilder();
+        query.append("select * from account where ").append(columnName).append("=? ");
+        //String query = "select * from account where "+ columnName +"= ?";
         JdbcContext jdbcContext = new JdbcContext(connectionMaker);
         MapperRow<Account> mapperRow = resultSet -> new Account(
                 resultSet.getLong("account_id"),
@@ -111,7 +112,17 @@ public class AccountDao implements AccountRepository {
                 resultSet.getObject("password_update_date", LocalDate.class),
                 resultSet.getBoolean("alarm_change_password"),
                 resultSet.getBoolean("receive_email"));
-        return jdbcContext.executeQueryInContext(query, mapperRow, nickname);
+        return jdbcContext.executeQueryInContext(query.toString(), mapperRow, columnValue);
+    }
+
+    @Override
+    public Account findByNickname(String nickname) {
+        return findByNicknameOrEmail("nickname", nickname);
+    }
+
+    @Override
+    public Account findByEmail(String email) {
+        return findByNicknameOrEmail("email", email);
     }
 
     public boolean existsByEmail(String email){

@@ -54,7 +54,11 @@ public class JdbcContext {
 
     public <T> T executeQuery(String query, MapperRow<T> mapperRow, MakePrepareStatement makePrepareStatement) {
         List<T> queryList = executeQueryList(query, mapperRow, makePrepareStatement);
-        if(queryList == null) return null;
+        System.out.println("jdbc - before null "+query);
+        if(queryList.isEmpty()) {
+            System.out.println("null check");
+            return null;
+        }
         return queryList.get(0);
     }
 
