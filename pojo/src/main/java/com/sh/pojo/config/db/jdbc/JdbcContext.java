@@ -72,9 +72,9 @@ public class JdbcContext {
             statement = connection.prepareStatement(query);
 
             makePrepareStatement.setParameters(statement);
-
             resultSet = statement.executeQuery();
 
+            log.info("jdbc : rs >>  "+statement.toString());
             while (resultSet.next()){
                 accountList.add(mapperRow.mapper(resultSet));
             }

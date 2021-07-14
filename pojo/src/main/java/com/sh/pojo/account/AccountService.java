@@ -7,20 +7,26 @@ import com.sh.pojo.account.domain.form.request.LoginRequest;
 import com.sh.pojo.account.domain.form.request.PasswordForm;
 import com.sh.pojo.account.domain.form.request.SignUpForm;
 import com.sh.pojo.account.exception.AccountNotFoundException;
+import com.sh.pojo.account.security.SecurityContext;
+import com.sh.pojo.account.security.SecurityService;
 import com.sh.pojo.account.security.domain.Authentication;
+import com.sh.pojo.account.security.domain.User;
+import com.sh.pojo.account.security.repository.UserRepository;
 import com.sh.pojo.common.Page;
 import com.sh.pojo.config.PasswordHashing;
 import com.sh.pojo.config.db.Dao;
 
 import java.util.List;
+import java.util.Objects;
 
-public class AccountService {
+public class AccountService extends SecurityService {
 
     private final AccountRepository accountRepository;
 
     private static final AccountService accountService = new AccountService(Dao.getInstance(AccountRepository.class));
 
     private AccountService(AccountRepository accountRepository){
+        super();
         this.accountRepository = accountRepository;
     }
 
@@ -33,24 +39,32 @@ public class AccountService {
         return account.getPassword().equals(PasswordHashing.encode(inputPassword));
     }
 
-    public Authentication login(LoginRequest loginRequest) {
+    public void login(LoginRequest loginRequest) {
         String nickOrEmail = loginRequest.getLoginId();
+        User getUser = loadUserByUsername(nickOrEmail);
+        // TODO getAccount change to security user
+        // sesssion 확인 후 니까-> 해당 session 삭제 후
+        // 회원가입 추천
+//        if(getAccount == null) return new Authentication();  // 로그인 거절 (isAuthenticated = flase)
+//        // user가 로그인 중인지 확인 하여 authenticaton 통해 2명이상의 사용자는 불가하다 메세지 전달
+//        Authentication authentication = new Authentication(getAccount);
+//        authentication.setDuplicatedLogin(getUser.isLogined());
+//        getUser.updateByLogin(authentication);
+//        DaoFactory.userDao().update(getUser);
+        SecurityContext.getContext().isAuthenticated(getUser);
+    }
+
+    @Override
+    public User loadUserByUsername(String nickOrEmail) {
         Account getAccount = accountRepository.findByNickname(nickOrEmail);
         if (getAccount == null) {
             getAccount = accountRepository.findByEmail(nickOrEmail);
         }
-
-        // TODO getAccount change to security user
-        // sesssion 확인 후 니까-> 해당 session 삭제 후
-        // 회원가입 추천
-        if(getAccount == null) return new Authentication();  // 로그인 거절 (isAuthenticated = flase)
-        // user가 로그인 중인지 확인 하여 authenticaton 통해 2명이상의 사용자는 불가하다 메세지 전달
-        Authentication authentication = new Authentication(getAccount);
-//        authentication.setDuplicatedLogin(getUser.isLogined());
-//        getUser.updateByLogin(authentication);
-//        DaoFactory.userDao().update(getUser);
-        return authentication;
+        if(Objects.isNull(getAccount)) throw new AccountNotFoundException();
+        return new User(getAccount);
     }
+
+
     public boolean isValidSignUp(SignUpForm form) {
         return !accountRepository.existsByNickname(form.getNickname()) &&
                 !accountRepository.existsByEmail(form.getEmail());
@@ -117,5 +131,6 @@ public class AccountService {
         return accountResponse;
 //        return Header.OK(userApiResponse);
     }
+
 
 }

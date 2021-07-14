@@ -34,34 +34,12 @@ public class AccountDao implements AccountRepository {
 
     @Override
     public boolean save(Account account) {
-        Connection connection = null;
-        PreparedStatement statement = null;
-        try {
-            connection = connectionMaker.makeConnection();
-            String query = "INSERT INTO account (nickname, password, email, join_at, password_update_date, alarm_change_password, receive_email) VALUES (?,?,?,?,?,?,?);";
+        String query = "INSERT INTO account (nickname, password, email, join_at, password_update_date, alarm_change_password, receive_email) VALUES (?,?,?,?,?,?,?);";
 
-            statement = connection.prepareStatement(query);
-            statement.setString(1,account.getNickname());
-            statement.setString(2,account.getPassword());
-            statement.setString(3,account.getEmail());
-            statement.setObject(4,account.getJoinedAt());
-            statement.setObject(5,account.getPasswordUpdateDate());
-            statement.setBoolean(6,account.isAlarmChangePassword());
-            statement.setBoolean(7,account.isReceiveEmail());
-            int result = statement.executeUpdate();
-            if(result!=1) return false;
-        }  catch (ClassNotFoundException | SQLException e) {
-            throw new DataAccessException(e);
-        } finally {
-            try {
-                if (statement != null) statement.close();
-                if ( connection != null ) connection.close();
-            } catch (SQLException e){
-                throw new DataAccessException(e);
-            }
+        JdbcContext jdbcContext = new JdbcContext(connectionMaker);
+        return jdbcContext.executeUpdateInContext(query, account.getNickname(), account.getPassword(), account.getEmail(), account.getJoinedAt()
+                , account.getPasswordUpdateDate(), account.isAlarmChangePassword(), account.isReceiveEmail());
         }
-        return true;
-    }
 
     @Override
     public Account findById(Long id) {
@@ -102,7 +80,6 @@ public class AccountDao implements AccountRepository {
     public Account findByNicknameOrEmail(String columnName, String columnValue ) {
         StringBuilder query = new StringBuilder();
         query.append("select * from account where ").append(columnName).append("=? ");
-        //String query = "select * from account where "+ columnName +"= ?";
         JdbcContext jdbcContext = new JdbcContext(connectionMaker);
         MapperRow<Account> mapperRow = resultSet -> new Account(
                 resultSet.getLong("account_id"),

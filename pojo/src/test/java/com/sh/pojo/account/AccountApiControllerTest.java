@@ -29,9 +29,9 @@ class AccountApiControllerTest {
     private static final String PATCH = "PATCH";
     private static final String DELETE = "DELETE";
 
-    String nickname = "sunhwa";
-    String email = "sunhwa21@eamil.com";
-    String password = "1234asdf";
+    private String nickname = "sunhwa";
+    private String email = "sunhwa21@eamil.com";
+    private String password = "1234asdf";
 
     @BeforeAll
     static void beforeAll() throws SQLException, NamingException {
@@ -70,6 +70,7 @@ class AccountApiControllerTest {
         );
 
         URL url2 = sendUrl(URI, PORT, "/api/login");
+        data.put("loginId", nickname);
         TestResponse response2 = request(POST, url2, new Gson().toJson(data));
 
         assert response != null;

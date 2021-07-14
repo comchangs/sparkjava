@@ -42,7 +42,7 @@ public class Authentication {
         return token;
     }
 
-    public void setToken() {
+    private void setToken() {
         this.token = UUID.randomUUID().toString();
     }
 
@@ -50,7 +50,7 @@ public class Authentication {
         return sessionId;
     }
 
-    public void setSessionId() {
+    private void setSessionId() {
         this.sessionId =  PasswordHashing.encode(this.username+ this.token);
     }
 
@@ -88,8 +88,6 @@ public class Authentication {
     public String toString() {
         return "Authentication{" +
                 "username='" + username + '\'' +
-                ", token='" + token + '\'' +
-                ", sessionId='" + sessionId + '\'' +
                 ", authenticated=" + authenticated +
                 ", duplicatedLogin=" + duplicatedLogin +
                 '}';

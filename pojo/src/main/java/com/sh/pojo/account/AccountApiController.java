@@ -50,8 +50,8 @@ public class AccountApiController {
                     }
                     Gson gson = new Gson();
                     LoginRequest loginRequest = gson.fromJson(request.body(), LoginRequest.class);
-                    Authentication authentication = accountService.login(loginRequest);
-                    session.attribute("user",authentication.getSessionId());
+                    accountService.login(loginRequest);
+                    session.attribute("user","test");
                     return Response.OK();
                 }, json());
 
