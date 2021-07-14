@@ -1,32 +1,47 @@
 package com.sh.pojo.account.security;
 
+import com.sh.pojo.account.security.domain.Authentication;
+import com.sh.pojo.account.security.domain.SessionData;
 import com.sh.pojo.account.security.domain.User;
+import com.sh.pojo.account.security.repository.UserRepository;
+import com.sh.pojo.config.db.Dao;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SecurityContext {
 
-    private static final SecurityContext SECURITY_CONTEXT = new SecurityContext();
+    private final UserRepository userRepository;
+
+    private static final SecurityContext SECURITY_CONTEXT = new SecurityContext(Dao.getInstance(UserRepository.class));
     private Set<String> cookie = ConcurrentHashMap.newKeySet();
-    private SecurityContext() {}
+    private SecurityContext(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public static SecurityContext getContext(){
         return SECURITY_CONTEXT;
     }
 
-    public void setAuthentication(String sessionId){
-        cookie.add(sessionId);
+    public SessionData isAuthenticated(User user) {
+        Authentication authentication = new Authentication(user);
+        if(user.isLogined()){
+            userRepository.deleteById(user.getAccountId());
+            //authentication.alarmDuplicatedLogin();         // ... SessionData 로
+        }
+
+        int count = 0;
+        while (cookie.contains(authentication.getSessionId())){
+            cookie.remove(authentication.getSessionId());
+            authentication.changeToken();
+            count++;
+            if(count >=10) break;
+        }
+
+        user.newSessionId(authentication.getSessionId());
+        cookie.add(authentication.getSessionId());
+        userRepository.save(user);
+        return SessionData.create(authentication);
     }
-
-    public boolean isAuthenticated(User user) {
-        return cookie.contains("sessionId");
-    }
-
-    // AccountService login시 setAuthentication 등록 (새 token 발급 -> 새 쿠키 발급)
-
-    // 새 token UserRepository에 저장 => SecurityService 통해서
-    // 저장 정보 SecurityContext map 에 로그인 동안 보관 - 로그아웃시 로그아웃, 쿠키 삭제
-
 
 }

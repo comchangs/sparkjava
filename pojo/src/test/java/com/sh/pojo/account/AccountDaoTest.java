@@ -1,4 +1,4 @@
-package com.sh.pojo;
+package com.sh.pojo.account;
 
 import com.sh.pojo.account.AccountRepository;
 import com.sh.pojo.account.domain.Account;

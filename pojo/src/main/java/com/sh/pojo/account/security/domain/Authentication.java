@@ -8,6 +8,8 @@ import java.util.UUID;
 
 public class Authentication {
 
+    private Long userId;
+
     private String username;
 
     private String token;
@@ -18,15 +20,20 @@ public class Authentication {
 
     private boolean duplicatedLogin;
 
-    public Authentication() {
-        this.setAuthenticated(false);
+    private Authentication() {
     }
 
-    public Authentication(Account account) {
-        this.username = account.getNickname();
+    public Authentication(User user) {
+        this.userId = user.getAccountId();
+        this.username = user.getName();
         this.setToken();
         this.setSessionId();
         this.setAuthenticated(true);
+        user.newSessionId(this.getSessionId());
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 
     public String getUsername() {
@@ -51,14 +58,14 @@ public class Authentication {
     }
 
     private void setSessionId() {
-        this.sessionId =  PasswordHashing.encode(this.username+ this.token);
+        this.sessionId =  PasswordHashing.encode(this.username + this.token);
     }
 
     public boolean isAuthenticated() {
         return authenticated;
     }
 
-    public void setAuthenticated(boolean authenticated) {
+    private void setAuthenticated(boolean authenticated) {
         this.authenticated = authenticated;
     }
 
@@ -67,8 +74,18 @@ public class Authentication {
         return duplicatedLogin;
     }
 
-    public void setDuplicatedLogin(boolean duplicatedLogin) {
+    private void setDuplicatedLogin(boolean duplicatedLogin) {
         this.duplicatedLogin = duplicatedLogin;
+    }
+
+    public void changeToken(){
+        this.setToken();
+        this.setSessionId();
+    }
+
+
+    public void alarmDuplicatedLogin() {
+        this.duplicatedLogin = true;
     }
 
     @Override
@@ -92,4 +109,5 @@ public class Authentication {
                 ", duplicatedLogin=" + duplicatedLogin +
                 '}';
     }
+
 }

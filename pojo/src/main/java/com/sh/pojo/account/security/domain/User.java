@@ -18,8 +18,11 @@ public class User {
 
     private boolean isLogined;
 
+    private String sessionId;
+
     public User() {};
 
+    // UserDao save
     public User(Long id, Long accountId, String name, LocalDateTime loginAt, LocalDateTime logoutAt, boolean isLogined) {
         this.id = id;
         this.accountId = accountId;
@@ -29,40 +32,36 @@ public class User {
         this.isLogined = isLogined;
     }
 
-    // BoardDetailServlet 에서 seesionId 통해 UserDao 조회 - 허용된 접속자 정보 제공 위해
-    public User(Long id, Long accountId, String nickname) {
-        this.id = id;
-        this.accountId = accountId;
-        this.name = nickname;
-    }
-    // login 시 UserDao 에서
-    public User(Account account) {
-        this.accountId = account.getId();
-        this.name = account.getNickname();
-        this.loginAt = LocalDateTime.now();
-        this.isLogined = true;
+    public static User createUser(Account account) {
+        User user = new User();
+        user.setAccountId(account.getId());
+        user.setName(account.getNickname());
+        user.setLoginAt(LocalDateTime.now());
+        user.setLogined(true);
+        return user;
     }
 
-    // 회원가입시 - Account isAuthentication()에서
-    public void createIsAuthenticatedUser(Account account) {
-        this.accountId = account.getId();
-        this.name = account.getNickname();
-        this.loginAt = LocalDateTime.now();
+    public Long getId() {
+        return id;
     }
 
     public Long getAccountId() {
         return accountId;
     }
 
-    public void setAccountId(Long accountId) {
+    private void setAccountId(Long accountId) {
         this.accountId = accountId;
+    }
+
+    public String getSessionId() {
+        return sessionId;
     }
 
     public LocalDateTime getLoginAt() {
         return loginAt;
     }
 
-    public void setLoginAt(LocalDateTime loginAt) {
+    private void setLoginAt(LocalDateTime loginAt) {
         this.loginAt = loginAt;
     }
 
@@ -70,7 +69,7 @@ public class User {
         return isLogined;
     }
 
-    public void setLogined(boolean isLogined) {
+    private void setLogined(boolean isLogined) {
         this.isLogined = isLogined;
     }
 
@@ -78,17 +77,15 @@ public class User {
         return name;
     }
 
-    public void setName(String name) {
+    private void setName(String name) {
         this.name = name;
     }
 
-    public void updateByLogin(Authentication authentication) {
-        this.isLogined = true;
-        this.loginAt = LocalDateTime.now();
-
+    public void newSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 
-    public void updateByLogout(Authentication authentication) {
+    public void updateByLogout() {
         this.isLogined = false;
         this.logoutAt = LocalDateTime.now();
     }

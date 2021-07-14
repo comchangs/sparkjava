@@ -7,6 +7,7 @@ import com.sh.pojo.account.domain.form.request.LoginRequest;
 import com.sh.pojo.account.domain.form.request.PasswordForm;
 import com.sh.pojo.account.domain.form.request.SignUpForm;
 import com.sh.pojo.account.security.domain.Authentication;
+import com.sh.pojo.account.security.domain.SessionData;
 import com.sh.pojo.common.Page;
 import com.sh.pojo.config.network.response.Response;
 import org.slf4j.Logger;
@@ -44,14 +45,11 @@ public class AccountApiController {
                 }, json());
 
                 post("/login", "application/json", (request, response) -> {
-                    Session session = request.session();
-                    if(!session.isNew()){
-                        log.warn("later : no logout, retry login : session update >> ");
-                    }
+
                     Gson gson = new Gson();
                     LoginRequest loginRequest = gson.fromJson(request.body(), LoginRequest.class);
-                    accountService.login(loginRequest);
-                    session.attribute("user","test");
+
+                    SessionData sessionData = accountService.login(loginRequest);
                     return Response.OK();
                 }, json());
 
