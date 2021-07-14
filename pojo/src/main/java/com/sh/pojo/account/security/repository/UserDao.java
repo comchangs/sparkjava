@@ -62,8 +62,9 @@ public class UserDao implements UserRepository {
 
     @Override
     public Boolean deleteAll() {
-        return null;
-
+        String query = "TRUNCATE user";
+        JdbcContext context = new JdbcContext(connectionMaker);
+        return context.executeUpdateInContext(query);
     }
 
 }

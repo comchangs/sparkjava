@@ -15,9 +15,24 @@ personal, 2021.07/06 ~ ing
 * 사용자 목록
 
 ### work
-* jsend
-* jdbc, dbcp
-* AccountDaoTest
+* rest api - [jsend](https://github.com/omniti-labs/jsend)
+* jdbc
+  * JdbcContext : separate jdbc for decreasing duplicated code (try/catch, preparestatement, resultset) 
+  * MakePrepareStatement interface : jdbc method's parameter
+  * MapperRow interface : resultset
+* dbcp 
+  * ConnectionMaker interface : connection information, Dao and DBConnectionManager
+  * ConnectionPool interface : control the number of connection / realease 
+* session 
+  * SecurityService interface : when login, change input information to security user
+  * SecurityContext : singleton pattern / when login, isAuthenticated method make user sessionID
+  * Authentication : make token and sessionID, using UUID and PasswordHashing class
+  * SessionData : the session information send client (after check user, before login recode) 
+  
+### test
+* AccountDaoTest : test for the dbcp code refactoring
+* AccountApiControllerTest : test for POST /api/register , /api/login before code refactoring
+
 
 ### Configuration
 * AppConfig

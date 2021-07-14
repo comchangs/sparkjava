@@ -44,4 +44,6 @@ public class SecurityContext {
         return SessionData.create(authentication);
     }
 
+    // TODO logout
+
 }
