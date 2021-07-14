@@ -9,11 +9,11 @@ import com.sh.pojo.account.domain.form.request.SignUpForm;
 import com.sh.pojo.account.security.domain.Authentication;
 import com.sh.pojo.common.Page;
 import com.sh.pojo.config.network.response.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.Session;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.Set;
 
 import static com.sh.pojo.config.network.response.JsonUtil.jsend;
 import static com.sh.pojo.config.network.response.JsonUtil.json;
@@ -22,6 +22,7 @@ import static spark.Spark.*;
 public class AccountApiController {
 
     public AccountApiController(AccountService accountService) {
+        Logger log = LoggerFactory.getLogger(this.getClass());
 
         path("/api",() -> {
             path("/", () -> {
@@ -38,13 +39,14 @@ public class AccountApiController {
                         return Response.ERROR("Unable to communicate with database");
                     }
                     response.status(201);
+
                     return Response.OK(jsend("register", signUpForm));
                 }, json());
 
                 post("/login", "application/json", (request, response) -> {
                     Session session = request.session();
                     if(!session.isNew()){
-                        System.out.println("no logout, retry login : session update >> ");
+                        log.warn("later : no logout, retry login : session update >> ");
                     }
                     Gson gson = new Gson();
                     LoginRequest loginRequest = gson.fromJson(request.body(), LoginRequest.class);

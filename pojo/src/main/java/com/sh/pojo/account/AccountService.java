@@ -35,9 +35,7 @@ public class AccountService {
 
     public Authentication login(LoginRequest loginRequest) {
         String nickOrEmail = loginRequest.getLoginId();
-        System.out.println(nickOrEmail);
         Account getAccount = accountRepository.findByNickname(nickOrEmail);
-        //System.out.println("find nickname 확인 "+ getAccount.toString());
         if (getAccount == null) {
             getAccount = accountRepository.findByEmail(nickOrEmail);
         }

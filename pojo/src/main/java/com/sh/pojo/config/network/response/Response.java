@@ -1,9 +1,6 @@
 package com.sh.pojo.config.network.response;
 
 import com.google.gson.JsonElement;
-import com.sh.pojo.config.network.ResponseStatus;
-
-import java.util.HashMap;
 
 public class Response {
 

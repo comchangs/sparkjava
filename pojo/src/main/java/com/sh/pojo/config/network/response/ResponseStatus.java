@@ -1,4 +1,4 @@
-package com.sh.pojo.config.network;
+package com.sh.pojo.config.network.response;
 
 public enum ResponseStatus {
 
