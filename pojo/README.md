@@ -1,8 +1,11 @@
 
 # project
 personal, 2021.07/06 ~ ing
+* code rafactoring 
+  * repository : [board and comment (Servlet/JSP)](https://github.com/sunhwa-kim/servlet-JSP-board-and-comment)
+* JAVA and understand web application (Spring)
 
-### BE
+### BackEnd
 * java project
 * JDK 11
 * MySql 
@@ -14,7 +17,7 @@ personal, 2021.07/06 ~ ing
 * 로그인, 로그아웃 
 * 사용자 목록
 
-### work
+### My work
 * rest api - [jsend](https://github.com/omniti-labs/jsend)
 * jdbc
   * JdbcContext : separate jdbc for decreasing duplicated code (try/catch, preparestatement, resultset) 
@@ -27,9 +30,10 @@ personal, 2021.07/06 ~ ing
   * SecurityService interface : when login, change input information to security user
   * SecurityContext : singleton pattern / when login, isAuthenticated method make user sessionID
   * Authentication : make token and sessionID, using UUID and PasswordHashing class
-  * SessionData : the session information send client (after check user, before login recode) 
+    * refactoring - encapsulation, static constructor
+  * SessionData : the session information send client (after check user, login recode) 
   
-### test
+### TEST
 * AccountDaoTest : test for the dbcp code refactoring
 * AccountApiControllerTest : test for POST /api/register , /api/login before code refactoring
 
